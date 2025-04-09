@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --env-file=.env index.js"
+    "start": "nodemon --config 1200ms --env-file=.env index.js"
   },
   "keywords": [],
   "author": "",
