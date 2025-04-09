@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaBell, FaCheckCircle, FaTrash } from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
+import { FaCheckCircle } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 import './NotificationSystem.css';
 
 const NotificationSystem = ({ userId }) => {
@@ -14,7 +16,7 @@ const NotificationSystem = ({ userId }) => {
     const fetchNotifications = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/notifications/user/${userId}`);
+            const response = await axios.get(`http://localhost:8000/api/notifications/user/${userId}`);
             setNotifications(response.data.notifications);
             setUnreadCount(response.data.notifications.filter(n => !n.isRead).length);
             setError(null);
@@ -39,7 +41,7 @@ const NotificationSystem = ({ userId }) => {
     // Mark a notification as read
     const markAsRead = async (notificationId) => {
         try {
-            await axios.patch(`/api/notifications/${notificationId}/read`);
+            await axios.patch(`http://localhost:8000/api/notifications/${notificationId}/read`);
             setNotifications(notifications.map(notification =>
                 notification._id === notificationId
                     ? { ...notification, isRead: true }
@@ -54,7 +56,7 @@ const NotificationSystem = ({ userId }) => {
     // Mark all notifications as read
     const markAllAsRead = async () => {
         try {
-            await axios.patch(`/api/notifications/user/${userId}/read-all`);
+            await axios.patch(`http://localhost:8000/api/notifications/user/${userId}/read-all`);
             setNotifications(notifications.map(notification => ({
                 ...notification,
                 isRead: true
@@ -68,7 +70,7 @@ const NotificationSystem = ({ userId }) => {
     // Delete a notification
     const deleteNotification = async (notificationId) => {
         try {
-            await axios.delete(`/api/notifications/${notificationId}`);
+            await axios.delete(`http://localhost:8000/api/notifications/${notificationId}`);
             setNotifications(notifications.filter(n => n._id !== notificationId));
             setUnreadCount(prev => 
                 notifications.find(n => n._id === notificationId && !n.isRead)
@@ -96,7 +98,7 @@ const NotificationSystem = ({ userId }) => {
     return (
         <div className="notification-system">
             <div className="notification-bell" onClick={() => setShowNotifications(!showNotifications)}>
-                <FaBell size={24} />
+                <FaBell size={24} className="text-white hover:text-gray-300 transition-colors" />
                 {unreadCount > 0 && (
                     <span className="notification-badge">{unreadCount}</span>
                 )}

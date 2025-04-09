@@ -1,11 +1,15 @@
 import { React, useState, useEffect } from 'react';
-import { Bell, Filter, Search } from 'lucide-react';
-import axios from "axios"
+import { Bell, Filter, Search, List } from 'lucide-react';
+import axios from "axios";
+import { Link, useNavigate } from 'react-router-dom';
+import NotificationSystem from './NotificationSystem';
 
 const Navbar = () => {
   const [drop, setDrop] = useState(false)
   const [animeList, setAnimeList] = useState([])
   const [query, setQuery] = useState("")
+  const navigate = useNavigate()
+  const userId = "1" // Hardcoded for now
 
   // Getting animelist from database
   const getAnimeList = async (query = '') => {
@@ -68,9 +72,18 @@ const Navbar = () => {
               <div className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-gray-900 shadow-lg ring-1 ring-white/10 max-h-64 overflow-y-auto transition-all" role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
                 <div className="py-1" role="none">
                   {filteredList.map((anime, i) => (
-                    <a key={i} href="#" className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition" role="menuitem" tabIndex={0}>
+                    <div
+                      key={i}
+                      onClick={() => {
+                        setDrop(false);
+                        navigate(`/anime/${anime._id}`);
+                      }}
+                      className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition cursor-pointer"
+                      role="menuitem"
+                      tabIndex={0}
+                    >
                       {anime.name}
-                    </a>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -80,7 +93,10 @@ const Navbar = () => {
           </div>
         </div>
 
-        <button className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white">
+        <Link to="/all-anime" className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white hover:bg-[#333333]">
+          All Anime
+        </Link>
+        <button className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white hover:bg-[#333333]">
           <Filter size={16} className="mr-1" />
           Filter
         </button>
@@ -92,8 +108,13 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Notification bell */}
-      <Bell size={22} className="text-white" />
+      {/* Right side icons */}
+      <div className="flex items-center gap-4">
+        <Link to="/watchlist" className="flex items-center text-white hover:text-gray-300">
+          <List size={22} />
+        </Link>
+        <NotificationSystem userId={userId} />
+      </div>
     </nav >
   );
 };

@@ -3,9 +3,15 @@ import AnimeListModel from '../models/AnimeList.js';
 // GET all anime entries
 export const getAllAnime = async (req, res) => {
   try {
+    console.log('🔍 Attempting to fetch anime list...');
+    console.log('📑 Collection name:', AnimeListModel.collection.name);
+    console.log('📒 Collection namespace:', AnimeListModel.collection.namespace);
     const animeList = await AnimeListModel.find();
+    console.log('📊 Found anime list:', animeList);
+    console.log('📈 Number of documents found:', animeList.length);
     res.status(200).json(animeList);
   } catch (err) {
+    console.error('❌ Error fetching anime list:', err);
     res.status(500).json({ error: 'Failed to fetch anime list' });
   }
 };
