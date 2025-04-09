@@ -13,12 +13,12 @@ const RatingSystem = ({ animeId, userId }) => {
     useEffect(() => {
         const fetchRatings = async () => {
             try {
-                const response = await axios.get(`/api/ratings/anime/${animeId}`);
+                const response = await axios.get(`http://localhost:8000/api/ratings/anime/${animeId}`);
                 setAllRatings(response.data.ratings);
                 setStats(response.data.stats);
 
                 // Get user's existing rating if any
-                const userRating = await axios.get(`/api/ratings/anime/${animeId}/user/${userId}`);
+                const userRating = await axios.get(`http://localhost:8000/api/ratings/anime/${animeId}/user/${userId}`);
                 if (userRating.data) {
                     setRating(userRating.data.rating);
                     setReview(userRating.data.review || '');
@@ -33,7 +33,7 @@ const RatingSystem = ({ animeId, userId }) => {
 
     const handleRatingSubmit = async () => {
         try {
-            await axios.post('/api/ratings', {
+            await axios.post('http://localhost:8000/api/ratings', {
                 animeId,
                 userId,
                 rating,
@@ -41,7 +41,7 @@ const RatingSystem = ({ animeId, userId }) => {
             });
 
             // Refresh ratings after submission
-            const response = await axios.get(`/api/ratings/anime/${animeId}`);
+            const response = await axios.get(`http://localhost:8000/api/ratings/anime/${animeId}`);
             setAllRatings(response.data.ratings);
             setStats(response.data.stats);
         } catch (error) {
