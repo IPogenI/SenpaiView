@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 
-router.get('/', getAllAnime);
+router.get('/animeList', getAllAnime);
 router.get('/:id', getAnimeById);
 router.post('/', createAnime);
 router.put('/:id', updateAnime);
