@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaBell } from 'react-icons/fa';
-import { FaCheckCircle } from 'react-icons/fa';
-import { FaTrash } from 'react-icons/fa';
+import { Bell, CheckCircle, Trash } from 'lucide-react';
 import './NotificationSystem.css';
 
 const NotificationSystem = ({ userId }) => {
@@ -98,7 +96,7 @@ const NotificationSystem = ({ userId }) => {
     return (
         <div className="notification-system">
             <div className="notification-bell" onClick={() => setShowNotifications(!showNotifications)}>
-                <FaBell size={24} className="text-white hover:text-gray-300 transition-colors" />
+                <Bell size={24} className="text-white hover:text-gray-300 transition-colors" />
                 {unreadCount > 0 && (
                     <span className="notification-badge">{unreadCount}</span>
                 )}
@@ -144,7 +142,7 @@ const NotificationSystem = ({ userId }) => {
                                                 className="action-button read"
                                                 title="Mark as read"
                                             >
-                                                <FaCheckCircle />
+                                                <CheckCircle />
                                             </button>
                                         )}
                                         <button
@@ -152,7 +150,7 @@ const NotificationSystem = ({ userId }) => {
                                             className="action-button delete"
                                             title="Delete notification"
                                         >
-                                            <FaTrash />
+                                            <Trash />
                                         </button>
                                     </div>
                                 </div>
