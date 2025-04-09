@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Star, Plus, Check } from 'lucide-react';
+import { FaSpinner } from 'react-icons/fa';
 
 const AllAnimePage = () => {
   const [animeList, setAnimeList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const userId = "1"; // Replace with actual user authentication
 
   useEffect(() => {
@@ -11,18 +13,19 @@ const AllAnimePage = () => {
   }, []);
 
   const fetchAnimeList = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('http://localhost:8000/api/anime');
       // Get watchlist status for each anime
       const watchlistRes = await axios.get(`http://localhost:8000/api/watchlist/${userId}`);
       const watchlistMap = new Map(watchlistRes.data.map(item => [item.animeId._id, item]));
-      
+
       // Get user ratings for each anime
       const animeWithDetails = await Promise.all(response.data.map(async (anime) => {
         try {
           const ratingRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}/user/${userId}`);
           const allRatingsRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}`);
-          
+
           const { stats } = allRatingsRes.data;
           const averageRating = stats ? stats.averageRating : 0;
 
@@ -45,6 +48,8 @@ const AllAnimePage = () => {
       setAnimeList(animeWithDetails);
     } catch (error) {
       console.error('Error fetching anime list:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,9 +86,8 @@ const AllAnimePage = () => {
           <button
             key={star}
             onClick={() => onRate(star)}
-            className={`${
-              star <= userRating ? 'text-yellow-400' : 'text-gray-400'
-            } hover:text-yellow-400 transition-colors`}
+            className={`${star <= userRating ? 'text-yellow-400' : 'text-gray-400'
+              } hover:text-yellow-400 transition-colors`}
           >
             <Star size={20} fill={star <= userRating ? 'currentColor' : 'none'} />
           </button>
@@ -92,8 +96,17 @@ const AllAnimePage = () => {
     );
   };
 
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center w-screen h-screen bg-black">
+        <FaSpinner className="animate-spin text-gray-800" size={40} />
+      </div>
+    );
+  }
+
   return (
-    <div className="pt-20 px-4">
+    <div className="pt-20 px-4 bg-black">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold text-white mb-6">All Anime</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -103,24 +116,23 @@ const AllAnimePage = () => {
                 <h2 className="text-xl font-semibold text-white">{anime.name}</h2>
                 <button
                   onClick={() => !anime.inWatchlist && addToWatchlist(anime._id)}
-                  className={`flex items-center gap-1 px-3 py-1 rounded ${
-                    anime.inWatchlist
+                  className={`flex items-center gap-1 px-3 py-1 rounded ${anime.inWatchlist
                       ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
+                    }`}
                   disabled={anime.inWatchlist}
                 >
                   {anime.inWatchlist ? <Check size={16} /> : <Plus size={16} />}
                   {anime.inWatchlist ? 'Added' : 'Add to Watchlist'}
                 </button>
               </div>
-              
+
               <div className="text-gray-400 mb-3">
                 <p>Episodes: {anime.episodes || 'N/A'}</p>
                 <p>Status: {anime.status}</p>
                 <p>Genres: {anime.genres}</p>
               </div>
-              
+
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-gray-400 mb-1">Your Rating:</p>

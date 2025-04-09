@@ -31,25 +31,10 @@ const Navbar = () => {
     anime.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  //Handling clicking outside
-  // useEffect(() => {
-  //   const handleClickOutside = (e) => {
-  //     if (dropDownRef.current && !dropDownRef.current.contains(e.target)) {
-  //       setDrop(false);
-  //     }
-  //   }
-  //   document.body.addEventListener('click', handleClickOutside);
-
-  //   return () => {
-  //     document.body.removeEventListener('click', handleClickOutside);
-  //   }
-  // }, [])
-
-
 
 
   return (
-    <nav className="absolute w-screen bg-black text-white px-4 py-3 flex items-center justify-between z-50">
+    <nav className="absolute w-screen text-white px-8 py-2 flex items-center justify-between z-50">
       {/* Left avatar */}
       <img
         src="/logo/Logo.png" // Replace with actual path
@@ -59,7 +44,9 @@ const Navbar = () => {
 
       {/* Center nav box */}
       <div className="flex items-center justify-center bg-[#1a1a1a] rounded-xl px-4 py-2 gap-4 w-full max-w-4xl mx-4">
-        <button className="bg-[#262626] text-white px-4 py-2 rounded-md font-semibold">Home</button>
+        <Link to="/" className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white hover:bg-[#333333] whitespace-nowrap">
+          Home
+        </Link>
 
         <div className="flex items-center bg-[#1a1a1a] px-3 py-2 rounded-md text-sm text-gray-300 w-full">
           <Search size={18} className="mr-2" />
