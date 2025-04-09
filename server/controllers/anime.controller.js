@@ -24,9 +24,16 @@ export const getAnimeById = async (req, res) => {
 // POST new anime entry
 export const createAnime = async (req, res) => {
   try {
-    const newAnime = new AnimeListModel(req.body);
-    const savedAnime = await newAnime.save();
-    res.status(201).json(savedAnime);
+    // Check if the body is an array or a single object
+    if (Array.isArray(req.body)) {
+      const savedAnimes = await AnimeListModel.insertMany(req.body);
+      res.status(201).json(savedAnimes);
+    } else {
+      // If it's a single object, save one record
+      const newAnime = new AnimeListModel(req.body);
+      const savedAnime = await newAnime.save();
+      res.status(201).json(savedAnime);
+    }
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

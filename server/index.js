@@ -6,7 +6,7 @@ import watchlistRoutes from './routes/watchlist.routes.js';
 import ratingRoutes from './routes/rating.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8000
 
 const app = express()
 app.use(cors())

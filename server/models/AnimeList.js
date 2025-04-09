@@ -29,7 +29,6 @@ const animeListSchema = new mongoose.Schema({
   },
   popularity: {
     type: String,
-    unique: true,
     default: 'N/A',
   },
   doj: {
