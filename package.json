@@ -12,7 +12,11 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.12",
     "axios": "^1.8.2",
+    "deepseek-api": "^1.0.6",
+    "framer-motion": "^12.6.3",
+    "groq-sdk": "^0.19.0",
     "lucide-react": "^0.487.0",
+    "openai": "^4.93.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
