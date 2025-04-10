@@ -6,6 +6,7 @@ import About from './pages/About.jsx'
 import WatchlistPage from './pages/WatchlistPage.jsx'
 import AnimeDetailsPage from './pages/AnimeDetailsPage.jsx'
 import AllAnimePage from './pages/AllAnimePage.jsx'
+import StreamPage from './pages/StreamPage.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -19,6 +20,7 @@ function App() {
           <Route path='/watchlist' element={<WatchlistPage/>} />
           <Route path='/anime/:id' element={<AnimeDetailsPage/>} />
           <Route path='/all-anime' element={<AllAnimePage/>} />
+          <Route path='/stream' element={<StreamPage/>} />
         </Route>
       </>
     )

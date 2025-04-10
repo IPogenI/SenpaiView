@@ -108,7 +108,7 @@ const AllAnimePage = () => {
   return (
     <div className="pt-20 px-4 bg-black w-screen overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-6">All Anime</h1>
+        <h1 className="text-2xl font-bold text-white mb-6 px-6 pt-6">All Anime</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {animeList.map((anime) => (
             <div key={anime._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
