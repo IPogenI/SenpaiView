@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.12",
+    "@tailwindcss/vite": "^4.1.3",
     "axios": "^1.8.2",
     "deepseek-api": "^1.0.6",
     "framer-motion": "^12.6.3",
@@ -20,8 +20,10 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "react-player": "^2.16.0",
     "react-router-dom": "^7.5.0",
-    "tailwindcss": "^4.0.12"
+    "tailwind-scrollbar": "^4.0.2",
+    "tailwindcss": "^4.1.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
