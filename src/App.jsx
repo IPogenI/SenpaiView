@@ -11,7 +11,8 @@ import AllAnimePage from './pages/AllAnimePage.jsx'
 import StreamPage from './pages/StreamPage.jsx'
 import Register from './components/Register.jsx'
 import Login from './components/Login.jsx'
-import ProfilePage from './pages/ProfilePage.jsx' 
+import ProfilePage from './pages/ProfilePage.jsx'
+import LocalCreatorsPage from './pages/LocalCreatorsPage.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -29,6 +30,7 @@ function App() {
           <Route path='/profile' element={<ProfilePage/>}/>
           <Route path='/login' element={<Login/>}/>
           <Route path='/register' element={<Register/>}/>
+          <Route path='/local-creators' element={<LocalCreatorsPage/>}/>
         </Route>
       </>
     )
