@@ -3,13 +3,43 @@ import { Filter, Search, List } from 'lucide-react';
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
 import NotificationSystem from './NotificationSystem';
+import Register from './Register';
+import { useSelector, useDispatch } from 'react-redux'
+import { logout, reset } from "../features/auth/authSlice"
+import Login from './Login';
 
 const Navbar = () => {
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  // Function to open Register modal
+  const openRegister = () => {
+    setIsRegisterOpen(true);
+    setIsLoginOpen(false);  // Close login modal if it's open
+  };
+
+  // Function to open Login modal from Register
+  const openLogin = () => {
+    setIsRegisterOpen(false); // Close Register modal
+    setIsLoginOpen(true);     // Open Login modal
+  };
+
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
+
+  const [isOpen, setIsOpen] = useState(false)
   const [drop, setDrop] = useState(false)
   const [animeList, setAnimeList] = useState([])
   const [query, setQuery] = useState("")
-  const navigate = useNavigate()
   const userId = "1" // Hardcoded for now
+
+  const onLogout = () => {
+    dispatch(logout())
+    dispatch(reset())
+    navigate("/")
+  }
+
 
   // Getting animelist from database
   const getAnimeList = async (query = '') => {
@@ -20,7 +50,7 @@ const Navbar = () => {
       console.error("Error fetching anime list:", err);
     }
   };
-  
+
   useEffect(() => {
     if (drop && animeList.length === 0) {
       getAnimeList();
@@ -36,11 +66,31 @@ const Navbar = () => {
   return (
     <nav className="absolute w-screen text-white px-8 py-2 flex items-center justify-between z-50">
       {/* Left avatar */}
-      <img
-        src="/logo/Logo.png" // Replace with actual path
-        alt="Profile"
-        className="w-10 h-10 rounded-full border-2 border-blue-500"
-      />
+      {user ? (
+        <li className="flex gap-2">
+          <img
+            src="/logo/Logo.png" // Replace with actual path
+            alt="Profile"
+            className="w-10 h-10 rounded-full border-2 border-blue-500"
+          />
+          <button className="btn" onClick={onLogout}>
+            Logout
+          </button>
+        </li>
+      ) : (
+        <div className="flex gap-2">
+          <img
+            src="/logo/Logo.png" // Replace with actual path
+            alt="Profile"
+            className="w-10 h-10 rounded-full border-2 border-blue-500"
+            onClick={openRegister}
+          />
+          <Register open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} onLogin={openLogin} />
+          <Login loggedIn={isLoginOpen} onLoginClose={() => setIsLoginOpen(false)} />
+        </div>
+      )
+      }
+
 
       {/* Center nav box */}
       <div className="flex items-center justify-center bg-[#1a1a1a] rounded-xl px-4 py-2 gap-4 w-full max-w-4xl mx-4">
