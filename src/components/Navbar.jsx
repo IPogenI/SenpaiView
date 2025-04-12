@@ -26,13 +26,12 @@ const Navbar = () => {
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { user } = useSelector((state) => state.auth)
+  const { user } = useSelector((state) => state.auth);
 
-  const [isOpen, setIsOpen] = useState(false)
-  const [drop, setDrop] = useState(false)
-  const [animeList, setAnimeList] = useState([])
-  const [query, setQuery] = useState("")
-  const userId = "1" // Hardcoded for now
+  const [isOpen, setIsOpen] = useState(false);
+  const [drop, setDrop] = useState(false);
+  const [animeList, setAnimeList] = useState([]);
+  const [query, setQuery] = useState("");
 
   const onLogout = () => {
     dispatch(logout())
@@ -150,7 +149,7 @@ const Navbar = () => {
         <Link to="/watchlist" className="flex items-center text-white hover:text-gray-300">
           <List size={22} />
         </Link>
-        <NotificationSystem userId={userId} />
+        {user && <NotificationSystem userId={user._id} />}
       </div>
     </nav >
   );

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Star, Plus, Check } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
@@ -6,24 +8,36 @@ import { FaSpinner } from 'react-icons/fa';
 const AllAnimePage = () => {
   const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userId = "1"; // Replace with actual user authentication
+  const [error, setError] = useState(null);
+  
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAnimeList();
-  }, []);
+    if (!user) {
+      navigate('/');
+      return;
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAnimeList();
+    }
+  }, [user]);
 
   const fetchAnimeList = async () => {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:8000/api/anime');
       // Get watchlist status for each anime
-      const watchlistRes = await axios.get(`http://localhost:8000/api/watchlist/${userId}`);
+      const watchlistRes = await axios.get(`http://localhost:8000/api/watchlist/${user._id}`);
       const watchlistMap = new Map(watchlistRes.data.map(item => [item.animeId._id, item]));
 
       // Get user ratings for each anime
       const animeWithDetails = await Promise.all(response.data.map(async (anime) => {
         try {
-          const ratingRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}/user/${userId}`);
+          const ratingRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}/user/${user._id}`);
           const allRatingsRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}`);
 
           const { stats } = allRatingsRes.data;
@@ -55,9 +69,7 @@ const AllAnimePage = () => {
 
   const handleRating = async (animeId, rating) => {
     try {
-      await axios.post('http://localhost:8000/api/ratings', {
-        userId,
-        animeId,
+      await axios.post(`http://localhost:8000/api/ratings/${user._id}/anime/${animeId}`, {
         rating
       });
       fetchAnimeList(); // Refresh the list to update ratings
@@ -68,9 +80,7 @@ const AllAnimePage = () => {
 
   const addToWatchlist = async (animeId) => {
     try {
-      await axios.post('http://localhost:8000/api/watchlist', {
-        userId,
-        animeId,
+      await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${animeId}`, {
         status: 'Plan to Watch'
       });
       fetchAnimeList(); // Refresh the list to update watchlist status
@@ -113,7 +123,7 @@ const AllAnimePage = () => {
           {animeList.map((anime) => (
             <div key={anime._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
               <div className="flex justify-between items-start mb-3">
-                <h2 className="text-xl font-semibold text-white">{anime.name}</h2>
+                <h2 className="text-xl font-semibold text-white hover:text-blue-400 cursor-pointer" onClick={() => navigate(`/anime/${anime._id}`)}>{anime.name}</h2>
                 <button
                   onClick={() => !anime.inWatchlist && addToWatchlist(anime._id)}
                   className={`flex items-center gap-1 px-3 py-1 rounded ${anime.inWatchlist

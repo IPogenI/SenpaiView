@@ -8,28 +8,28 @@ const animeListSchema = new mongoose.Schema({
   },
   genres: {
     type: String,
-    default: 'N/A',
+    required: true,
   },
   status: {
     type: String,
-    default: 'Finished Airing',
+    required: true,
   },
   premiered: {
     type: String,
-    default: 'Spring 2025',
+    required: true,
   },
   episodes: {
     type: Number,
     required: true,
-    default: 0,
+
   },
   rating: {
     type: Number,
-    default: 0,
+
   },
   popularity: {
     type: String,
-    default: 'N/A',
+    required: true,
   },
   doj: {
     type: Date,
