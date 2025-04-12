@@ -5,9 +5,10 @@ import connectDB from "./db/db.js";
 import animeRoutes from './routes/anime.routes.js';
 import watchlistRoutes from './routes/watchlist.routes.js';
 import ratingRoutes from './routes/rating.routes.js';
-import notificationRoutes from './routes/notification.routes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import chatRoutes from './routes/chat.routes.js';
 import userRoutes from './routes/userRoutes.js';
+import imdbRoutes from './routes/imdb.routes.js';
 import { errorHandler } from './middleware/errorMiddleware.js'
 
 const PORT = process.env.PORT || 8000
@@ -24,7 +25,8 @@ app.use('/api/watchlist', watchlistRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/users', userRoutes)
+app.use('/api/users', userRoutes);
+app.use('/api/imdb', imdbRoutes);
 app.use(errorHandler)
 
 

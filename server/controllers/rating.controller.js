@@ -1,9 +1,15 @@
+import mongoose from 'mongoose';
 import Rating from '../models/Rating.js';
 
 // Create or update a rating
 export const rateAnime = async (req, res) => {
     try {
-        const { animeId, userId, rating, review } = req.body;
+        const { animeId, userId } = req.params;
+        const { rating, review } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(animeId)) {
+            return res.status(400).json({ message: 'Invalid user ID or anime ID' });
+        }
 
         if (!animeId || !userId || !rating || rating < 1 || rating > 5) {
             return res.status(400).json({ message: 'Invalid rating data' });
