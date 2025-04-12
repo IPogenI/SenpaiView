@@ -7,16 +7,22 @@ const NotificationSystem = ({ userId }) => {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     // Fetch notifications
     const fetchNotifications = async () => {
         try {
             setLoading(true);
+            if (!userId) {
+                setNotifications([]);
+                setUnreadCount(0);
+                return;
+            }
             const response = await axios.get(`http://localhost:8000/api/notifications/user/${userId}`);
-            setNotifications(response.data.notifications);
-            setUnreadCount(response.data.notifications.filter(n => !n.isRead).length);
+            const notificationsData = response.data || [];
+            setNotifications(notificationsData);
+            setUnreadCount(notificationsData.filter(n => !n.isRead).length);
             setError(null);
         } catch (err) {
             setError('Failed to fetch notifications');
@@ -28,12 +34,18 @@ const NotificationSystem = ({ userId }) => {
 
     // Initial fetch and setup polling
     useEffect(() => {
-        fetchNotifications();
-        
-        // Poll for new notifications every 30 seconds
-        const pollInterval = setInterval(fetchNotifications, 30000);
-        
-        return () => clearInterval(pollInterval);
+        if (userId) {
+            fetchNotifications();
+            
+            // Poll for new notifications every 30 seconds
+            const pollInterval = setInterval(fetchNotifications, 30000);
+            
+            return () => clearInterval(pollInterval);
+        } else {
+            setNotifications([]);
+            setUnreadCount(0);
+            setLoading(false);
+        }
     }, [userId]);
 
     // Mark a notification as read
@@ -93,6 +105,10 @@ const NotificationSystem = ({ userId }) => {
         }
     };
 
+    if (!userId) {
+        return null;
+    }
+
     return (
         <div className="notification-system">
             <div className="notification-bell" onClick={() => setShowNotifications(!showNotifications)}>
@@ -106,7 +122,7 @@ const NotificationSystem = ({ userId }) => {
                 <div className="notification-panel">
                     <div className="notification-header">
                         <h3>Notifications</h3>
-                        {notifications.length > 0 && (
+                        {notifications && notifications.length > 0 && (
                             <button onClick={markAllAsRead} className="mark-all-read">
                                 Mark all as read
                             </button>
@@ -117,7 +133,11 @@ const NotificationSystem = ({ userId }) => {
                     {error && <div className="error">{error}</div>}
 
                     <div className="notification-list">
-                        {notifications.length === 0 ? (
+                        {loading ? (
+                            <div className="loading">Loading notifications...</div>
+                        ) : error ? (
+                            <div className="error">{error}</div>
+                        ) : !notifications || notifications.length === 0 ? (
                             <div className="no-notifications">No notifications</div>
                         ) : (
                             notifications.map(notification => (

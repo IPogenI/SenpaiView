@@ -37,7 +37,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     if(user){
         res.status(200).json({
-            _id: user.id,
+            _id: user._id,
             name: user.name,
             email: user.email,
             token: generateToken(user._id)
@@ -63,7 +63,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     if(user && (await bcrypt.compare(password, user.password))) {
         res.json({
-            _id: user.id,
+            _id: user._id,
             name: user.name,
             email: user.email,
             token: generateToken(user._id)
@@ -82,10 +82,15 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 
 export const getUser = asyncHandler(async (req, res) => {
-    const {_id, name, email} = await userModel.findById(req.user.id)
+    const user = await userModel.findOne({ _id: req.user.id })
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found')
+    }
+    const { _id, name, email } = user
 
     res.status(200).json({
-        id: _id,
+        _id: _id,
         name,
         email
     })

@@ -4,7 +4,7 @@ import * as ratingController from '../controllers/rating.controller.js';
 const router = express.Router();
 
 // POST - Create/Update a rating
-router.post('/', ratingController.rateAnime);
+router.post('/:userId/anime/:animeId', ratingController.rateAnime);
 
 // GET - Get all ratings for an anime
 router.get('/anime/:animeId', ratingController.getAnimeRatings);

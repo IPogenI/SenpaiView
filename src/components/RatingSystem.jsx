@@ -13,18 +13,25 @@ const RatingSystem = ({ animeId, userId }) => {
     useEffect(() => {
         const fetchRatings = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/ratings/anime/${animeId}`);
-                setAllRatings(response.data.ratings);
-                setStats(response.data.stats);
+                const [animeRatings, userRating] = await Promise.all([
+                    axios.get(`http://localhost:8000/api/ratings/anime/${animeId}`),
+                    userId ? axios.get(`http://localhost:8000/api/ratings/anime/${animeId}/user/${userId}`) : Promise.resolve({ data: null })
+                ]);
 
-                // Get user's existing rating if any
-                const userRating = await axios.get(`http://localhost:8000/api/ratings/anime/${animeId}/user/${userId}`);
+                setAllRatings(animeRatings.data.ratings);
+                setStats(animeRatings.data.stats);
+
                 if (userRating.data) {
                     setRating(userRating.data.rating);
                     setReview(userRating.data.review || '');
+                } else {
+                    setRating(0);
+                    setReview('');
                 }
             } catch (error) {
                 console.error('Error fetching ratings:', error);
+                setAllRatings([]);
+                setStats({ totalRatings: 0, averageRating: 0 });
             }
         };
 
@@ -32,6 +39,16 @@ const RatingSystem = ({ animeId, userId }) => {
     }, [animeId, userId]);
 
     const handleRatingSubmit = async () => {
+        if (!userId) {
+            console.error('User must be logged in to rate');
+            return;
+        }
+
+        if (!rating) {
+            console.error('Please select a rating');
+            return;
+        }
+
         try {
             await axios.post('http://localhost:8000/api/ratings', {
                 animeId,

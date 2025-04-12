@@ -14,7 +14,11 @@ export const protect = asyncHandler(async (req, res, next) =>{
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
             //  Get user from the token
-            req.user = await userModel.findById(decoded.id).select("-password")
+            req.user = await userModel.findOne({ _id: decoded.id }).select("-password")
+            if (!req.user) {
+                res.status(401)
+                throw new Error("User not found")
+            }
 
             next()
         } catch (error) {
