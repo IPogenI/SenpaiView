@@ -161,6 +161,7 @@ const AllAnimePage = () => {
           ))}
         </div>
       </div>
+
     </div>
   );
 };
