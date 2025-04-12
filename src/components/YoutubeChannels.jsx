@@ -1,40 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaSpinner } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const YoutubeChannels = () => {
   const [channels] = useState([
     { handle: '@AntikMahmud', name: 'Antik Mahmud' },
     { handle: '@SamimaSraboni', name: 'Samima Sraboni' },
     { handle: '@FrozenFire100', name: 'Frozen Fire' },
+    { handle: '@NOTYOURTYPE', name: 'NOTYOURTYPE' },
     // Add more channels as needed
   ]);
 
   const [channelVideos, setChannelVideos] = useState({});
-  const [selectedVideo, setSelectedVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const fetchChannelVideos = async (handle) => {
-    console.log('Fetching videos for handle:', handle);
-    try {
+      try {
       const response = await axios.get(`http://localhost:8000/api/youtube/channel/${handle}`);
-      console.log('API Response:', response.data);
-      if (response.data && response.data.videos) {
-        console.log('Setting videos for handle:', handle, response.data.videos);
-        setChannelVideos(prev => {
+        if (response.data && response.data.videos) {
+          setChannelVideos(prev => {
           const newState = {
             ...prev,
             [handle]: response.data.videos
           };
-          console.log('New channel videos state:', newState);
-          return newState;
+            return newState;
         });
       } else {
-        console.error('Invalid response format:', response.data);
-      }
+        }
     } catch (error) {
-      console.error(`Error fetching videos for ${handle}:`, error);
+      console.error(`Error fetching videos for ${handle}:`, error.message);
       setError(`Error loading videos for ${handle}. Please try again later.`);
     }
   };
@@ -67,7 +64,7 @@ const YoutubeChannels = () => {
   }, []);
 
   const handleVideoSelect = (video) => {
-    setSelectedVideo(video);
+    navigate(`/youtube/${video.videoId}`, { state: { video } });
   };
 
   if (loading) {
@@ -127,33 +124,6 @@ const YoutubeChannels = () => {
           )}
         </div>
       ))}
-
-      {/* Video Player Modal */}
-      {selectedVideo && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          <div className="flex-1 relative">
-            <iframe
-              src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1`}
-              title={selectedVideo.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            ></iframe>
-          </div>
-          <div className="bg-gray-900 p-4 flex items-center justify-between">
-            <h3 className="text-white text-xl font-semibold truncate mr-4">
-              {selectedVideo.title}
-            </h3>
-            <button
-              onClick={() => setSelectedVideo(null)}
-              className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center space-x-2"
-            >
-              <span>Close</span>
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -12,7 +12,7 @@ import StreamPage from './pages/StreamPage.jsx'
 import Register from './components/Register.jsx'
 import Login from './components/Login.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
-import LocalCreatorsPage from './pages/LocalCreatorsPage.jsx'
+import YouTubePlayerPage from './pages/YouTubePlayerPage.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,7 +30,7 @@ function App() {
           <Route path='/profile' element={<ProfilePage/>}/>
           <Route path='/login' element={<Login/>}/>
           <Route path='/register' element={<Register/>}/>
-          <Route path='/local-creators' element={<LocalCreatorsPage/>}/>
+          <Route path='/youtube/:videoId' element={<YouTubePlayerPage/>}/>
         </Route>
       </>
     )

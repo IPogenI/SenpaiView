@@ -10,7 +10,6 @@ export const addToWatchlist = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(animeId)) {
       return res.status(400).json({ message: 'Invalid user ID or anime ID' });
     }
-    console.log('Adding to watchlist:', { userId, animeId, status });
     
     // Check if the anime exists
     const anime = await mongoose.model('AnimeList').findById(animeId);
@@ -57,7 +56,6 @@ export const addToWatchlist = async (req, res) => {
 export const getWatchlist = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log('Getting watchlist for user:', userId);
 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
@@ -78,10 +76,8 @@ export const getWatchlist = async (req, res) => {
       .filter(item => item.animeId)
       .sort((a, b) => b.addedAt - a.addedAt);
     
-    console.log('Found watchlist items:', validWatchlist);
     res.status(200).json(validWatchlist);
   } catch (error) {
-    console.error('Error in getWatchlist:', error);
     res.status(500).json({ message: error.message });
   }
 };
