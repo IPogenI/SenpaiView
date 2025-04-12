@@ -37,6 +37,6 @@ const animeListSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const AnimeListModel = mongoose.model('AnimeList', animeListSchema); // 💡 Capitalized model name
+const AnimeListModel = mongoose.model('AnimeList', animeListSchema); 
 
 export default AnimeListModel;

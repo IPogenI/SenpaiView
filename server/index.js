@@ -7,6 +7,8 @@ import watchlistRoutes from './routes/watchlist.routes.js';
 import ratingRoutes from './routes/rating.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import chatRoutes from './routes/chat.routes.js';
+import userRoutes from './routes/userRoutes.js';
+import { errorHandler } from './middleware/errorMiddleware.js'
 
 const PORT = process.env.PORT || 8000
 
@@ -22,6 +24,8 @@ app.use('/api/watchlist', watchlistRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/users', userRoutes)
+app.use(errorHandler)
 
 
 app.listen(PORT, () => {console.log(`Server is running on ${process.env.PORT}`)})
