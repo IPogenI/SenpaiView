@@ -188,7 +188,6 @@ export const getRecommendedAnime = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-
     // Get IDs of anime to exclude (in watchlist or watch history)
     const excludedAnimeIds = [
       ...user.watchlist.map(item => item.animeId._id.toString()),
@@ -221,8 +220,6 @@ export const getRecommendedAnime = async (req, res) => {
       .slice(0, 3)
       .map(([genre]) => genre);
 
-    console.log('Top 3 preferred genres:', topGenres);
-
     // Get recommendations for each top genre
     const recommendations = await Promise.all(topGenres.map(async (genre) => {
       return await mongoose.model('AnimeList')
@@ -238,8 +235,6 @@ export const getRecommendedAnime = async (req, res) => {
     const finalRecommendations = recommendations
       .flat()
       .filter(anime => anime !== null);
-
-    console.log(`Final recommendations count: ${finalRecommendations.length}`);
 
     // If we have less than 3 recommendations, fill with top rated anime
     if (finalRecommendations.length < 3) {
@@ -260,7 +255,6 @@ export const getRecommendedAnime = async (req, res) => {
 
     res.status(200).json(finalRecommendations.slice(0, 3)); // Ensure we return exactly 3 recommendations
   } catch (error) {
-    console.error('Error getting recommendations:', error);
     res.status(500).json({ message: error.message });
   }
 };
