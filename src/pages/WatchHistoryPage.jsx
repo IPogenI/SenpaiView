@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Star, Calendar, Film, Trash2 } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { Play } from 'lucide-react';
+import StarRating from '../components/StarRating';
 
 const WatchHistoryPage = () => {
     const [watchHistory, setWatchHistory] = useState([]);
@@ -45,6 +48,18 @@ const WatchHistoryPage = () => {
         }
     };
 
+    const handleRating = async (animeId, rating) => {
+        try {
+            await axios.post(`http://localhost:8000/api/ratings/${user._id}/anime/${animeId}`, {
+                rating
+            });
+            // Refresh the watch history to update ratings
+            fetchWatchHistory();
+        } catch (error) {
+            console.error('Error rating anime:', error);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center w-screen h-screen bg-gray-900">
@@ -64,57 +79,61 @@ const WatchHistoryPage = () => {
     }
 
     return (
-        <div className="pt-20 px-4 bg-gray-900 w-screen overflow-x-hidden">
+        <div className="min-h-screen pt-20 px-4 bg-gray-900 w-screen overflow-x-hidden">
             <div className="max-w-6xl mx-auto">
-                <section>
-                    <h1 className="text-2xl font-bold text-white mb-6">Watch History</h1>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-                        {watchHistory.map((item) => (
-                            <div key={item._id} className="bg-gray-800 rounded-lg p-6 shadow-lg relative">
-                                <div className="flex justify-between items-start mb-3">
-                                    <h2
-                                        className="text-xl font-semibold text-white hover:text-blue-400 cursor-pointer"
-                                        onClick={() => navigate(`/anime/${item.animeId._id}`)}
-                                    >
-                                        {item.animeId.name}
-                                    </h2>
-                                </div>
-
-                                <div className="text-gray-400 mb-3">
-                                    <p>Episodes: {item.animeId.episodes || 'N/A'}</p>
-                                    <p>Status: {item.animeId.status}</p>
-                                    <p>Genres: {item.animeId.genres}</p>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-2 text-yellow-400">
-                                        <Star size={20} />
-                                        <span className="text-2xl font-bold">
-                                            {item.animeId.rating || 'N/A'}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-gray-400">
-                                        <Calendar size={20} />
-                                        <span>{new Date(item.watchedAt).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-
+                <h1 className="text-2xl font-bold text-white mb-6">Watch History</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {watchHistory.map((item) => (
+                        <div key={item._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
+                            <div className="flex justify-between items-start mb-3">
+                                <h2 className="text-xl font-semibold text-white hover:text-blue-400 cursor-pointer" onClick={() => navigate(`/anime/${item.animeId._id}`)}>{item.animeId.name}</h2>
                                 <button
                                     onClick={() => removeFromWatchHistory(item.animeId._id)}
-                                    className="absolute top-4 right-4 p-2 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors"
-                                    title="Remove from watch history"
+                                    className="flex items-center gap-1 px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
                                 >
-                                    <Trash2 size={18} />
+                                    <Trash2 size={16} />
+                                    Remove
                                 </button>
                             </div>
-                        ))}
-                        {watchHistory.length === 0 && (
-                            <div className="col-span-full text-center text-gray-400 py-8">
-                                No items in watch history
+
+                            <div className="text-gray-400 mb-3">
+                                <p>Episodes: {item.animeId.episodes || 'N/A'}</p>
+                                <p>Status: {item.animeId.status}</p>
+                                <p>Genres: {item.animeId.genres}</p>
                             </div>
-                        )}
-                    </div>
-                </section>
+
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <p className="text-gray-400 mb-1">Your Rating:</p>
+                                    <StarRating
+                                        rating={5}
+                                        userRating={item.animeId.userRating}
+                                        onRate={(rating) => handleRating(item.animeId._id, rating)}
+                                    />
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-gray-400">Average Rating</p>
+                                    <p className="text-2xl font-bold text-yellow-400">{item.animeId.averageRating}</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <Link
+                                    to={`/anime/${item.animeId._id}/watch`}
+                                    className="flex items-center gap-1 px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                >
+                                    <Play size={16} />
+                                    Continue Watching
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+                    {watchHistory.length === 0 && (
+                        <div className="col-span-full text-center text-gray-400 py-8">
+                            No items in watch history
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

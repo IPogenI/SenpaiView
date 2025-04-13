@@ -181,22 +181,30 @@ export const getRecommendedAnime = async (req, res) => {
     }
 
     const user = await User.findOne({ _id: userId })
-      .populate('watchlist.animeId');
+      .populate('watchlist.animeId')
+      .populate('watchHistory.animeId');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // If watchlist is empty, return popular anime
+
+    // Get IDs of anime to exclude (in watchlist or watch history)
+    const excludedAnimeIds = [
+      ...user.watchlist.map(item => item.animeId._id.toString()),
+      ...user.watchHistory.map(item => item.animeId._id.toString())
+    ];
+
+    // If watchlist is empty, return top 3 highest rated anime
     if (user.watchlist.length === 0) {
-      const popularAnime = await mongoose.model('AnimeList')
-        .find()
+      const topRatedAnime = await mongoose.model('AnimeList')
+        .find({ _id: { $nin: excludedAnimeIds } })
         .sort({ rating: -1 })
-        .limit(10);
-      return res.status(200).json(popularAnime);
+        .limit(3);
+      return res.status(200).json(topRatedAnime);
     }
 
-    // Get user's preferred genres
+    // Get user's preferred genres with frequency count
     const genreCount = {};
     user.watchlist.forEach(item => {
       if (item.animeId && item.animeId.genres) {
@@ -207,41 +215,52 @@ export const getRecommendedAnime = async (req, res) => {
       }
     });
 
-    // Sort genres by frequency
-    const sortedGenres = Object.entries(genreCount)
+    // Sort genres by frequency and get top 3
+    const topGenres = Object.entries(genreCount)
       .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
       .map(([genre]) => genre);
 
-    // Get average rating from watchlist
-    const averageRating = user.watchlist.reduce((sum, item) => {
-      return sum + (item.animeId?.rating || 0);
-    }, 0) / user.watchlist.length;
+    console.log('Top 3 preferred genres:', topGenres);
 
-    // Find recommendations based on genres and rating
-    let recommendations = await mongoose.model('AnimeList')
-      .find({
-        genres: { $in: sortedGenres },
-        rating: { $gte: averageRating - 1 }
-      })
-      .limit(20);
-
-    // If not enough recommendations, relax the rating filter
-    if (recommendations.length < 10) {
-      recommendations = await mongoose.model('AnimeList')
+    // Get recommendations for each top genre
+    const recommendations = await Promise.all(topGenres.map(async (genre) => {
+      return await mongoose.model('AnimeList')
         .find({
-          genres: { $in: sortedGenres }
+          genres: { $regex: genre, $options: 'i' },
+          _id: { $nin: excludedAnimeIds }
         })
-        .limit(20);
+        .sort({ rating: -1 })
+        .limit(1); // Get top rated anime for each genre
+    }));
+
+    // Flatten and filter out any null results
+    const finalRecommendations = recommendations
+      .flat()
+      .filter(anime => anime !== null);
+
+    console.log(`Final recommendations count: ${finalRecommendations.length}`);
+
+    // If we have less than 3 recommendations, fill with top rated anime
+    if (finalRecommendations.length < 3) {
+      const additionalAnime = await mongoose.model('AnimeList')
+        .find({
+          _id: {
+            $nin: [
+              ...excludedAnimeIds,
+              ...finalRecommendations.map(a => a._id.toString())
+            ]
+          }
+        })
+        .sort({ rating: -1 })
+        .limit(3 - finalRecommendations.length);
+
+      finalRecommendations.push(...additionalAnime);
     }
 
-    // Filter out anime already in watchlist
-    const watchlistIds = user.watchlist.map(item => item.animeId._id.toString());
-    const finalRecommendations = recommendations.filter(anime =>
-      !watchlistIds.includes(anime._id.toString())
-    );
-
-    res.status(200).json(finalRecommendations);
+    res.status(200).json(finalRecommendations.slice(0, 3)); // Ensure we return exactly 3 recommendations
   } catch (error) {
+    console.error('Error getting recommendations:', error);
     res.status(500).json({ message: error.message });
   }
 };

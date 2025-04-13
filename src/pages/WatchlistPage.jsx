@@ -15,24 +15,37 @@ const WatchlistPage = () => {
   const navigate = useNavigate();
 
   const fetchRecommendations = async () => {
+    console.log('Fetching recommendations for user:', user._id);
     try {
-      console.log('Fetching recommendations for user:', user._id);
       const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}/recommendations`);
-
-      if (!response.data) {
-        console.error('No data received from recommendations endpoint');
-        return;
-      }
-
       console.log('Recommendations received:', response.data);
-      setRecommendations(response.data);
+
+      // Get ratings for each recommended anime
+      const recommendationsWithRatings = await Promise.all(response.data.map(async (anime) => {
+        try {
+          const allRatingsRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}`);
+          const { stats } = allRatingsRes.data;
+          const averageRating = stats ? stats.averageRating : 0;
+
+          return {
+            ...anime,
+            averageRating: averageRating.toFixed(1)
+          };
+        } catch (error) {
+          return {
+            ...anime,
+            averageRating: '0.0'
+          };
+        }
+      }));
+
+      setRecommendations(recommendationsWithRatings);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
       if (error.response) {
         console.error('Error response:', error.response.data);
         console.error('Error status:', error.response.status);
       }
-      setError('Failed to load recommendations');
     }
   };
 
@@ -224,8 +237,8 @@ const WatchlistPage = () => {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-gray-400">Rating</p>
-                  <p className="text-2xl font-bold text-yellow-400">{anime.rating?.toFixed(1) || 'N/A'}</p>
+                  <p className="text-gray-400">Average Rating</p>
+                  <p className="text-2xl font-bold text-yellow-400">{anime.averageRating}</p>
                 </div>
               </div>
             ))}
