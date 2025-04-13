@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { Plus, Star, Calendar, Film, Award } from 'lucide-react';
+import { Plus, Star, Calendar, Film, Award, Play } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
-import RatingSystem from '../components/RatingSystem';
 
 const AnimeDetailsPage = () => {
   const { id } = useParams();
@@ -13,7 +12,7 @@ const AnimeDetailsPage = () => {
   const [addedToWatchlist, setAddedToWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -51,7 +50,7 @@ const AnimeDetailsPage = () => {
         .replace(/\(.*?\)/g, '')   // Remove anything in parentheses
         .replace(/\[.*?\]/g, '')   // Remove anything in square brackets
         .trim();
-      
+
       console.log('Searching IMDB for:', searchTitle);
       const imdbResponse = await axios.get(`http://localhost:8000/api/imdb/${encodeURIComponent(searchTitle)}`);
       setImdbData(imdbResponse.data);
@@ -71,7 +70,6 @@ const AnimeDetailsPage = () => {
       const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}/check/${anime._id}`);
       setAddedToWatchlist(response.data.inWatchlist);
     } catch (error) {
-      console.error('Error checking watchlist status:', error);
       setAddedToWatchlist(false);
     }
   };
@@ -79,25 +77,26 @@ const AnimeDetailsPage = () => {
   const addToWatchlist = async () => {
     try {
       if (!anime?._id) {
-        console.error('Anime data not loaded');
         return;
       }
 
-      console.log('Adding to watchlist:', {
-        userId: user._id,
-        animeId: anime._id,
-        anime: anime
-      });
-
-      const response = await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${anime._id}`, {
+      await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${anime._id}`, {
         status: 'Plan to Watch'
       });
 
-      console.log('Add to watchlist response:', response.data);
       setAddedToWatchlist(true);
     } catch (error) {
-      console.error('Error adding to watchlist:', error);
-      console.error('Error details:', error.response?.data);
+      // Handle error silently
+    }
+  };
+
+  const handleWatchNow = async () => {
+    try {
+      await axios.post(`http://localhost:8000/api/watch-history/${user._id}/anime/${anime._id}`);
+      navigate(`/anime/${anime._id}/watch`);
+    } catch (error) {
+      // Still navigate even if watch history fails
+      navigate(`/anime/${anime._id}/watch`);
     }
   };
 
@@ -131,9 +130,9 @@ const AnimeDetailsPage = () => {
             {/* Left Column - Poster */}
             <div className="md:col-span-1">
               {imdbData?.poster && imdbData.poster !== 'N/A' ? (
-                <img 
-                  src={imdbData.poster} 
-                  alt={anime.name} 
+                <img
+                  src={imdbData.poster}
+                  alt={anime.name}
                   className="w-full rounded-lg shadow-lg"
                 />
               ) : (
@@ -144,21 +143,28 @@ const AnimeDetailsPage = () => {
               <button
                 onClick={addToWatchlist}
                 disabled={addedToWatchlist}
-                className={`w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg ${
-                  addedToWatchlist
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
+                className={`w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg ${addedToWatchlist
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
               >
                 <Plus size={20} />
                 {addedToWatchlist ? 'Added to Watchlist' : 'Add to Watchlist'}
+              </button>
+
+              <button
+                onClick={handleWatchNow}
+                className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700"
+              >
+                <Play size={20} />
+                Watch Now
               </button>
             </div>
 
             {/* Right Column - Details */}
             <div className="md:col-span-2">
               <h1 className="text-4xl font-bold text-white mb-4">{anime.name}</h1>
-              
+
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center gap-2 text-yellow-400">
                   <Star size={20} />
@@ -212,11 +218,6 @@ const AnimeDetailsPage = () => {
                   <p className="text-gray-300">{imdbData.awards}</p>
                 </div>
               )}
-
-              <div className="mt-8">
-                <h2 className="text-xl font-semibold text-white mb-4">Rate this Anime</h2>
-                <RatingSystem animeId={id} userId={user._id} />
-              </div>
             </div>
           </div>
         </div>
