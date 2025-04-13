@@ -139,7 +139,6 @@ const Navbar = () => {
 
         <div className="flex gap-4 ml-4 text-sm text-gray-300">
           <a href="#" className="hover:text-white">Trending</a>
-          <a href="#" className="hover:text-white">Subscriptions</a>
           <a href="#" className="hover:text-white">Support</a>
         </div>
       </div>

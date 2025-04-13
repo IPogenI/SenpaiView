@@ -5,7 +5,6 @@ import User from '../models/User.js';
 export const getUserNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log('Getting notifications for user:', userId);
 
     const user = await User.findOne({ _id: userId });
     if (!user) {
@@ -16,7 +15,6 @@ export const getUserNotifications = async (req, res) => {
     const notifications = user.notifications.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).json(notifications);
   } catch (error) {
-    console.error('Error getting notifications:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -41,7 +39,6 @@ export const markAsRead = async (req, res) => {
 
     res.status(200).json(notification);
   } catch (error) {
-    console.error('Error marking notification as read:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -68,7 +65,6 @@ export const addNotification = async (req, res) => {
 
     res.status(201).json(user.notifications[user.notifications.length - 1]);
   } catch (error) {
-    console.error('Error adding notification:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -96,7 +92,6 @@ export const deleteNotification = async (req, res) => {
 
     res.status(200).json({ message: 'Notification deleted' });
   } catch (error) {
-    console.error('Error deleting notification:', error);
     res.status(500).json({ message: error.message });
   }
 };

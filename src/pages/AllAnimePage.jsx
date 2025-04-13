@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Star, Plus, Check } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
+import YoutubeChannels from '../components/YoutubeChannels';
 
 const AllAnimePage = () => {
   const [animeList, setAnimeList] = useState([]);
@@ -118,8 +119,9 @@ const AllAnimePage = () => {
   return (
     <div className="pt-20 px-4 bg-gray-900 w-screen overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-6">All Anime</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+        <section>
+          <h1 className="text-2xl font-bold text-white mb-6">All Anime</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {animeList.map((anime) => (
             <div key={anime._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
               <div className="flex justify-between items-start mb-3">
@@ -159,7 +161,13 @@ const AllAnimePage = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Local Creators</h2>
+          <YoutubeChannels />
+        </section>
       </div>
     </div>
   );

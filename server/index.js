@@ -9,6 +9,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import chatRoutes from './routes/chat.routes.js';
 import userRoutes from './routes/userRoutes.js';
 import imdbRoutes from './routes/imdb.routes.js';
+import youtubeRoutes from './routes/youtubeRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js'
 
 const PORT = process.env.PORT || 8000
@@ -22,6 +23,7 @@ connectDB()
 app.get('/', (req, res) => res.send('🌍 API is running'));
 app.use('/api/anime', animeRoutes);
 app.use('/api/watchlist', watchlistRoutes);
+app.use('/api/youtube', youtubeRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);
