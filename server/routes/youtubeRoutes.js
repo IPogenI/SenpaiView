@@ -12,7 +12,7 @@ const isCacheStale = (lastUpdated) => {
 
 // Get channel videos (with caching)
 router.get('/channel/:handle', async (req, res) => {
-  console.log('Fetching videos for handle:', req.params.handle);
+
   try {
     const { handle } = req.params;
     
@@ -21,8 +21,7 @@ router.get('/channel/:handle', async (req, res) => {
     
     // If cache exists and is not stale, return cached data
     if (cacheEntry && !isCacheStale(cacheEntry.lastUpdated)) {
-      console.log('Cache hit! Age:', Math.round((Date.now() - new Date(cacheEntry.lastUpdated).getTime()) / 1000), 'seconds');
-      console.log('Returning', cacheEntry.videos.length, 'cached videos for:', req.params.handle);
+
       return res.json({
         channelId: cacheEntry.channelId,
         videos: cacheEntry.videos
@@ -48,15 +47,12 @@ router.get('/channel/:handle', async (req, res) => {
     }
 
     const channelId = channelResponse.data.items[0].id.channelId;
-    console.log('Found channel ID:', channelId);
-
     // Get recent videos (fetch more since we'll filter out Shorts)
-    console.log('Fetching videos for channel ID:', channelId);
     const videosResponse = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
       params: {
         part: 'snippet',
         channelId: channelId,
-        maxResults: 50, // Fetch more since we'll filter out Shorts
+        maxResults: 25, // Fetch more since we'll filter out Shorts
         order: 'date',
         type: 'video',
         key: process.env.YOUTUBE_API_KEY
@@ -111,16 +107,13 @@ router.get('/channel/:handle', async (req, res) => {
       }
     };
 
-    console.log('Video details response:', videoDetailsResponse.data);
-
     // Filter out Shorts (videos less than 5 minutes) and map to desired format
     let allVideos = videoDetailsResponse.data.items || [];
-    console.log(`Processing ${allVideos.length} total videos`);
 
     let filteredVideos = allVideos
       .filter(item => {
         if (!item.contentDetails?.duration) {
-          console.log(`Video ${item.id} - ${item.snippet?.title} - No duration found`);
+  
           return false;
         }
         const duration = parseDuration(item.contentDetails.duration);
@@ -132,7 +125,7 @@ router.get('/channel/:handle', async (req, res) => {
     console.log(`Found ${filteredVideos.length} videos longer than 5 minutes`);
     
     const videos = filteredVideos
-      .slice(0, 10) // Show up to 10 non-Shorts videos
+      .slice(0, 3) // Show up to 10 non-Shorts videos
       .map(item => ({
         videoId: item.id,
         title: item.snippet.title,
@@ -141,30 +134,22 @@ router.get('/channel/:handle', async (req, res) => {
         publishedAt: item.snippet.publishedAt
       }));
     
-    console.log('Final video list:', videos.map(v => ({ id: v.videoId, title: v.title })));
 
-    console.log('Final videos to be sent:', videos);
-
-    console.log(`Found ${videos.length} non-Short videos for channel:`, channelId);
-
-    console.log('Fetched videos:', videos);
     // Update or create cache
     try {
       if (cacheEntry) {
-        console.log('Updating existing cache for:', handle);
         cacheEntry.videos = videos;
         cacheEntry.lastUpdated = new Date();
         await cacheEntry.save();
-        console.log('Cache updated successfully with', videos.length, 'videos');
       } else {
-        console.log('Creating new cache entry for:', handle);
+
         await YoutubeCache.create({
           channelHandle: handle,
           channelId,
           videos,
           lastUpdated: new Date()
         });
-        console.log('New cache entry created with', videos.length, 'videos');
+
       }
     } catch (error) {
       console.error('Error updating cache:', error);

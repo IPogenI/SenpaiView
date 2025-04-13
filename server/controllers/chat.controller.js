@@ -60,17 +60,10 @@ export const createChatMessage = async (req, res) => {
       message: assistantMessage
     });
   } catch (error) {
-    console.error('Chat error:', error.response?.data?.error || error.message);
-    const errorMessage = error.response?.data?.error?.message || error.message || 'Error processing chat message';
-    
-    // Send a more user-friendly error message
     res.status(500).json({
       success: false,
       message: 'I apologize, but I encountered an error. Please try again in a moment.'
     });
-    
-    // Log the technical error for debugging
-    console.error('Technical error details:', errorMessage);
   }
 };
 
@@ -84,7 +77,6 @@ export const getChatHistory = async (req, res) => {
       messages: chat ? chat.messages : []
     });
   } catch (error) {
-    console.error('Error fetching chat history:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching chat history'
