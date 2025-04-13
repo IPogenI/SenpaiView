@@ -15,10 +15,8 @@ const WatchlistPage = () => {
   const navigate = useNavigate();
 
   const fetchRecommendations = async () => {
-    console.log('Fetching recommendations for user:', user._id);
     try {
       const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}/recommendations`);
-      console.log('Recommendations received:', response.data);
 
       // Get ratings for each recommended anime
       const recommendationsWithRatings = await Promise.all(response.data.map(async (anime) => {
@@ -39,13 +37,19 @@ const WatchlistPage = () => {
         }
       }));
 
-      setRecommendations(recommendationsWithRatings);
+      // Remove duplicates based on anime ID
+      const uniqueRecommendations = recommendationsWithRatings.reduce((acc, current) => {
+        const x = acc.find(item => item._id === current._id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
+
+      setRecommendations(uniqueRecommendations);
     } catch (error) {
-      console.error('Error fetching recommendations:', error);
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-      }
+      setError('Failed to load recommendations');
     }
   };
 
@@ -85,7 +89,6 @@ const WatchlistPage = () => {
 
       setWatchlist(watchlistWithDetails);
     } catch (error) {
-      console.error('Error fetching watchlist:', error);
       setError('Failed to load watchlist');
     } finally {
       setLoading(false);
@@ -113,7 +116,7 @@ const WatchlistPage = () => {
       });
       fetchWatchlist(); // Refresh the list to update ratings
     } catch (error) {
-      console.error('Error rating anime:', error);
+      setError('Failed to update rating');
     }
   };
 
@@ -122,7 +125,7 @@ const WatchlistPage = () => {
       await axios.delete(`http://localhost:8000/api/watchlist/${user._id}/anime/${animeId}`);
       fetchWatchlist(); // Refresh the list
     } catch (error) {
-      console.error('Error removing from watchlist:', error);
+      setError('Failed to remove from watchlist');
     }
   };
 
@@ -159,7 +162,7 @@ const WatchlistPage = () => {
       fetchWatchlist();
       fetchRecommendations(); // Refresh recommendations after adding to watchlist
     } catch (error) {
-      console.error('Error adding to watchlist:', error);
+      setError('Failed to add to watchlist');
     }
   };
 
