@@ -4,7 +4,8 @@ import {
   getWatchlist,
   updateWatchlistStatus,
   removeFromWatchlist,
-  checkWatchlistStatus
+  checkWatchlistStatus,
+  getRecommendedAnime
 } from '../controllers/watchlist.controller.js';
 
 const router = express.Router();
@@ -23,5 +24,8 @@ router.delete('/:userId/anime/:animeId', removeFromWatchlist);
 
 // Check if anime is in user's watchlist
 router.get('/:userId/check/:animeId', checkWatchlistStatus);
+
+// Get recommended anime based on watchlist
+router.get('/:userId/recommendations', getRecommendedAnime);
 
 export default router;

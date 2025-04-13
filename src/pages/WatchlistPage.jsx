@@ -2,35 +2,58 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Star, Trash2 } from 'lucide-react';
+import { Star, Trash2, Plus } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
 
 const WatchlistPage = () => {
   const [watchlist, setWatchlist] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/');
-      return;
-    }
-  }, [user, navigate]);
+  const fetchRecommendations = async () => {
+    console.log('Fetching recommendations for user:', user._id);
+    try {
+      const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}/recommendations`);
+      console.log('Recommendations received:', response.data);
 
-  useEffect(() => {
-    if (user) {
-      fetchWatchlist();
+      // Get ratings for each recommended anime
+      const recommendationsWithRatings = await Promise.all(response.data.map(async (anime) => {
+        try {
+          const allRatingsRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}`);
+          const { stats } = allRatingsRes.data;
+          const averageRating = stats ? stats.averageRating : 0;
+
+          return {
+            ...anime,
+            averageRating: averageRating.toFixed(1)
+          };
+        } catch (error) {
+          return {
+            ...anime,
+            averageRating: '0.0'
+          };
+        }
+      }));
+
+      setRecommendations(recommendationsWithRatings);
+    } catch (error) {
+      console.error('Error fetching recommendations:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+      }
     }
-  }, [user]);
+  };
 
   const fetchWatchlist = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}`);
-      
+
       // Get ratings for each anime in watchlist
       const watchlistWithDetails = await Promise.all(response.data.map(async (item) => {
         try {
@@ -68,6 +91,20 @@ const WatchlistPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+      return;
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchWatchlist();
+      fetchRecommendations();
+    }
+  }, [user]);
 
   const handleRating = async (animeId, rating) => {
     try {
@@ -114,6 +151,18 @@ const WatchlistPage = () => {
     );
   }
 
+  const addToWatchlist = async (animeId) => {
+    try {
+      await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${animeId}`, {
+        status: 'Plan to Watch'
+      });
+      fetchWatchlist();
+      fetchRecommendations(); // Refresh recommendations after adding to watchlist
+    } catch (error) {
+      console.error('Error adding to watchlist:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen pt-20 px-4 bg-gray-900 w-screen overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
@@ -159,6 +208,41 @@ const WatchlistPage = () => {
               No items in watchlist
             </div>
           )}
+        </div>
+
+        {/* Recommendations Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Recommended for You</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            {recommendations.map((anime) => (
+              <div key={anime._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <div className="flex justify-between items-start mb-3">
+                  <h2 className="text-xl font-semibold text-white hover:text-blue-400 cursor-pointer"
+                    onClick={() => navigate(`/anime/${anime._id}`)}>
+                    {anime.name}
+                  </h2>
+                  <button
+                    onClick={() => addToWatchlist(anime._id)}
+                    className="flex items-center gap-1 px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700"
+                  >
+                    <Plus size={16} />
+                    Add to Watchlist
+                  </button>
+                </div>
+
+                <div className="text-gray-400 mb-3">
+                  <p>Episodes: {anime.episodes || 'N/A'}</p>
+                  <p>Status: {anime.status}</p>
+                  <p>Genres: {anime.genres}</p>
+                </div>
+
+                <div className="text-right">
+                  <p className="text-gray-400">Average Rating</p>
+                  <p className="text-2xl font-bold text-yellow-400">{anime.averageRating}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
