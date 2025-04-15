@@ -33,3 +33,5 @@ app.use(errorHandler)
 
 
 app.listen(PORT, () => {console.log(`Server is running on ${process.env.PORT}`)})
+export default app
+// Compare this snippet from server/db/db.js:
