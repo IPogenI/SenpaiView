@@ -8,7 +8,6 @@ const YoutubeChannels = () => {
     { handle: '@AntikMahmud', name: 'Antik Mahmud' },
     { handle: '@SamimaSraboni', name: 'Samima Sraboni' },
     { handle: '@FrozenFire100', name: 'Frozen Fire' },
-    { handle: '@NOTYOURTYPE', name: 'NOTYOURTYPE' },
     // Add more channels as needed
   ]);
 
