@@ -12,8 +12,6 @@ import imdbRoutes from './routes/imdb.routes.js';
 import youtubeRoutes from './routes/youtubeRoutes.js';
 import watchHistoryRoutes from './routes/watchHistory.routes.js';
 import { errorHandler } from './middleware/errorMiddleware.js'
-require('dotenv').config();
-
 
 const PORT = process.env.PORT || 8000
 
