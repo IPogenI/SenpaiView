@@ -3,13 +3,24 @@ import { ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
 
 const slides = [
   {
+    title: 'Naruto',
+    subtitle: 'Shippuden',
+    rating: 'PG-13',
+    release: '2002',
+    quality: 'HD',
+    tags: ['CC 220', '220'],
+    video: "/img/mylivewallpapers-com-Naruto-Flames-4K-EDIT.mp4", // Replace with actual video URL or path
+    bg: '/img/605592.png', // Replace with image path if there's no video
+  },
+  {
     title: 'Solo Leveling',
     subtitle: 'Arise from the Shadows',
     rating: 'PG-13',
     release: '2024',
     quality: 'HD',
     tags: ['CC 20', '23'],
-    bg: "/img/wp11485180-solo-leveling-manga-wallpapers.png", // Insert actual image URL or path later
+    video: null, // Replace with actual video URL or path
+    bg: '/img/wp11485180-solo-leveling-manga-wallpapers.png', // Replace with image path if there's no video
   },
   {
     title: 'Frieren',
@@ -18,12 +29,12 @@ const slides = [
     release: '2023',
     quality: 'HD',
     tags: ['CC 28', '28'],
-    bg: "/img/wp14738966-frieren-desktop-wallpapers.jpg",
+    video: null, // No video, only image
+    bg: "/img/wp14738966-frieren-desktop-wallpapers.jpg", // Image path
   },
 ];
 
 const HomePage = () => {
-
   const [index, setIndex] = useState(0);
   const current = slides[index];
 
@@ -32,13 +43,26 @@ const HomePage = () => {
 
   return (
     <>
-      <div
-        className="relative bg-cover bg-center min-h-screen text-white transition-all duration-500 flex items-center"
-        style={{
-          backgroundImage: current.bg ? `url(${current.bg})` : 'linear-gradient(to right, #0f0f0f, #1a1a1a)', 
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}>
+      <div className="relative min-h-screen text-white flex items-center">
+        {/* Video or Image Background */}
+        {current.video ? (
+          <video
+            className="absolute top-0 left-0 w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+          >
+            <source src={current.video} type="video/mp4" />
+          </video>
+        ) : (
+          <div
+            className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${current.bg})`,
+            }}
+          />
+        )}
 
         {/* Overlay */}
         <div className="absolute top-0 left-0 w-screen h-screen bg-black opacity-50" />
@@ -53,8 +77,8 @@ const HomePage = () => {
             {current.tags.map((tag, i) => (
               <span
                 key={i}
-                className={`text-xs px-2 py-1 rounded-md ${i % 2 === 0 ? 'bg-red-600' : 'bg-green-600'
-                  }`}>
+                className={`text-xs px-2 py-1 rounded-md ${i % 2 === 0 ? 'bg-red-600' : 'bg-green-600'}`}
+              >
                 {tag}
               </span>
             ))}

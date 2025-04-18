@@ -18,6 +18,7 @@
     "axios": "^1.8.2",
     "bcryptjs": "^3.0.2",
     "deepseek-api": "^1.0.6",
+    "dotenv": "^16.5.0",
     "express-async-handler": "^1.2.0",
     "framer-motion": "^12.6.3",
     "groq-sdk": "^0.19.0",

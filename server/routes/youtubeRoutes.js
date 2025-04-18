@@ -125,7 +125,7 @@ router.get('/channel/:handle', async (req, res) => {
     console.log(`Found ${filteredVideos.length} videos longer than 5 minutes`);
     
     const videos = filteredVideos
-      .slice(0, 3) // Show up to 10 non-Shorts videos
+      .slice(0, 3) // Show up to 3 non-Shorts videos
       .map(item => ({
         videoId: item.id,
         title: item.snippet.title,
