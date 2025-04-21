@@ -119,7 +119,10 @@ const Register = ({ open, onClose, onLogin }) => {
               Submit
             </button>
 
-            <button type="button">Already Registered? <span className='text-blue-700 cursor-pointer' onClick={onLogin}>Sign in</span></button>
+            <button type="button">
+              <span className='text-gray-400 px-1'>Already Registered?</span>
+              <span className='text-blue-700 cursor-pointer' onClick={onLogin}>Sign in</span>
+            </button>
           </form>
         </section>
       </div>

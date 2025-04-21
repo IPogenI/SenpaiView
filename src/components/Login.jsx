@@ -25,7 +25,7 @@ const Overlay = {
 }
 
 
-const Login = ({loggedIn, onLoginClose}) => {
+const Login = ({loggedIn, onLoginClose, onRegister}) => {
   if (!loggedIn) return null;
 
   const [formData, setFormData] = useState({
@@ -75,11 +75,16 @@ const Login = ({loggedIn, onLoginClose}) => {
     return <Spinner />
   }
 
+  const handleRegisterClick = () => {
+    onLoginClose();
+    onRegister();
+  };
+
   return (
     <>
       <div style={Overlay}></div>
       <div style={Styles} className='flex h-screen w-[400px]'>
-        <section className="relative form flex self-center h-[40vh] w-screen bg-gray-800 p-12 rounded-lg">
+        <section className="relative form flex flex-col self-center h-[40vh] w-screen bg-gray-800 p-12 rounded-lg">
           {/* ❌ Cross button */}
           <button
             onClick={onLoginClose}
@@ -100,6 +105,9 @@ const Login = ({loggedIn, onLoginClose}) => {
               Submit
             </button>
           </form>
+          <div className="text-center mt-4 text-gray-400">
+            Not a user? <span onClick={handleRegisterClick} className="text-blue-700 cursor-pointer hover:text-blue-600 font-semibold">Register</span>
+          </div>
         </section>
       </div>
     </>

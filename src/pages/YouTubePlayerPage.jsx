@@ -15,12 +15,15 @@ const YouTubePlayerPage = () => {
     const fetchRecommendedVideos = async () => {
       setLoading(true);
       try {
-        // Fetch videos from all channels
-        const channels = ['@AntikMahmud', '@SamimaSraboni', '@FrozenFire100'];
+        // First fetch all channels
+        const channelsResponse = await axios.get('http://localhost:8000/api/youtube');
+        const channels = channelsResponse.data;
+        
         let allVideos = [];
 
-        for (const handle of channels) {
-          const response = await axios.get(`http://localhost:8000/api/youtube/channel/${handle}`);
+        // Fetch videos for each channel
+        for (const channel of channels) {
+          const response = await axios.get(`http://localhost:8000/api/youtube/channel/${channel.channelHandle}`);
           if (response.data && response.data.videos) {
             allVideos = [...allVideos, ...response.data.videos];
           }
