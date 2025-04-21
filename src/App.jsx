@@ -15,6 +15,7 @@ import Login from './components/Login.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import YouTubePlayerPage from './pages/YouTubePlayerPage.jsx'
 import WatchHistoryPage from './pages/WatchHistoryPage.jsx'
+import AdminPanel from './pages/AdminPanel.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -35,6 +36,7 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
           <Route path='/youtube/:videoId' element={<YouTubePlayerPage />} />
+          <Route path='/admin' element={<AdminPanel />} />
         </Route>
       </>
     )

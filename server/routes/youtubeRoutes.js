@@ -1,6 +1,12 @@
 import express from 'express';
-import YoutubeCache from '../models/youtubeCache.js';
+import Youtube from '../models/Youtube.js';
 import axios from 'axios';
+import { protect } from "../middleware/authMiddleware.js"
+import {
+    getAllChannels,
+    addChannel,
+    deleteChannel
+} from "../controllers/youtubeController.js"
 
 const router = express.Router();
 
@@ -17,7 +23,7 @@ router.get('/channel/:handle', async (req, res) => {
     const { handle } = req.params;
     
     // Check cache first
-    let cacheEntry = await YoutubeCache.findOne({ channelHandle: handle });
+    let cacheEntry = await Youtube.findOne({ channelHandle: handle });
     
     // If cache exists and is not stale, return cached data
     if (cacheEntry && !isCacheStale(cacheEntry.lastUpdated)) {
@@ -142,14 +148,8 @@ router.get('/channel/:handle', async (req, res) => {
         cacheEntry.lastUpdated = new Date();
         await cacheEntry.save();
       } else {
-
-        await YoutubeCache.create({
-          channelHandle: handle,
-          channelId,
-          videos,
-          lastUpdated: new Date()
-        });
-
+        // Instead of creating a new channel, return 404
+        return res.status(404).json({ message: 'Channel not found in database' });
       }
     } catch (error) {
       console.error('Error updating cache:', error);
@@ -162,5 +162,12 @@ router.get('/channel/:handle', async (req, res) => {
     res.status(500).json({ message: 'Error fetching YouTube data' });
   }
 });
+
+// Public route to get all channels
+router.get("/", getAllChannels);
+
+// Protected routes for admin operations
+router.post("/", protect, addChannel);
+router.delete("/:id", protect, deleteChannel);
 
 export default router;

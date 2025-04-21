@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
-const youtubeCacheSchema = new mongoose.Schema({
+const youtubeSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
   channelHandle: {
     type: String,
     required: true,
@@ -27,4 +31,4 @@ const youtubeCacheSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('YoutubeCache', youtubeCacheSchema);
+export default mongoose.model('YoutubeCache', youtubeSchema);

@@ -66,6 +66,7 @@ export const loginUser = asyncHandler(async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            isAdmin: user.isAdmin,
             token: generateToken(user._id)
         })
     } else {
@@ -87,14 +88,52 @@ export const getUser = asyncHandler(async (req, res) => {
         res.status(404)
         throw new Error('User not found')
     }
-    const { _id, name, email } = user
+    const { _id, name, email, isAdmin } = user
 
     res.status(200).json({
         _id: _id,
         name,
-        email
+        email,
+        isAdmin
     })
 }) 
+
+
+// @desc Get all users (admin only)
+// @route GET /api/users/all
+// @access Private/Admin
+export const getAllUsers = asyncHandler(async (req, res) => {
+    // Check if the user is an admin
+    if (!req.user.isAdmin) {
+        res.status(403);
+        throw new Error("Not authorized as admin");
+    }
+
+    const users = await userModel.find().select("-password");
+    res.status(200).json(users);
+});
+
+
+// @desc Delete a user (admin only)
+// @route DELETE /api/users/:id
+// @access Private/Admin
+export const deleteUser = asyncHandler(async (req, res) => {
+    // Check if the user is an admin
+    if (!req.user.isAdmin) {
+        res.status(403);
+        throw new Error("Not authorized as admin");
+    }
+
+    const user = await userModel.findById(req.params.id);
+    
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+
+    await userModel.deleteOne({ _id: req.params.id });
+    res.status(200).json({ message: "User removed" });
+});
 
 
 // Generate JWT
