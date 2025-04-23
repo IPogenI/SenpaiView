@@ -2,14 +2,15 @@ import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
     userId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
         required: true,
         index: true
     },
     type: {
         type: String,
         required: true,
-        enum: ['NEW_EPISODE', 'COMMUNITY_UPDATE', 'RECOMMENDATION']
+        enum: ['NEW_EPISODE', 'COMMUNITY_UPDATE', 'RECOMMENDATION', 'FRIEND_REQUEST']
     },
     title: {
         type: String,

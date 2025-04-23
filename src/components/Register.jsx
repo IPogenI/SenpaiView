@@ -5,7 +5,6 @@ import {toast} from 'react-toastify'
 import { register, reset } from '../features/auth/authSlice'
 import Spinner from "../components/Spinner"
 
-
 const Styles = {
   position: "fixed",
   top: "50%",
@@ -24,14 +23,7 @@ const Overlay = {
   zIndex: 1000
 }
 
-
 const Register = ({ open, onClose, onLogin }) => {
-  if (!open) return null
-  const loginUser = () => {
-    onClose()
-    setIsLogin(true)
-  }
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -51,8 +43,9 @@ const Register = ({ open, onClose, onLogin }) => {
       toast.error(message)
     }
 
-    if(isSuccess || user){
-      navigate('/')
+    if(isSuccess && user){
+      navigate('/profile')
+      toast.success(message || "Registration successful")
     }
 
     dispatch(reset())
@@ -86,6 +79,8 @@ const Register = ({ open, onClose, onLogin }) => {
     return <Spinner />
   }
 
+  if (!open) return null
+
   return (
     <>
       <div style={Overlay}></div>
@@ -97,7 +92,7 @@ const Register = ({ open, onClose, onLogin }) => {
             className="absolute top-5 right-5 text-gray-400 hover:text-gray-800 text-2xl font-bold focus:outline-none">
             &times;
           </button>
-          <form onSubmit={onSubmit} className="flex flex-col justify-center items-center w-[100%] space-y-4 pt-4">
+          <form onSubmit={onSubmit} className="space-y-4 pt-4">
             <input type="text" id="name" name="name" value={name} onChange={onChange}
               placeholder="Enter Name"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -118,8 +113,6 @@ const Register = ({ open, onClose, onLogin }) => {
               className="w-full bg-orange-500 text-white font-semibold py-2 rounded-md hover:bg-orange-600 transition duration-200">
               Submit
             </button>
-
-            <button type="button">Already Registered? <span className='text-blue-700 cursor-pointer' onClick={onLogin}>Sign in</span></button>
           </form>
         </section>
       </div>
