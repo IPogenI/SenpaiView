@@ -18,6 +18,18 @@ const watchlistItemSchema = new mongoose.Schema({
     }
 });
 
+const watchHistorySchema = new mongoose.Schema({
+    animeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AnimeList',
+        required: true
+    },
+    watchedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 const notificationSchema = new mongoose.Schema({
     message: {
         type: String,
@@ -71,7 +83,12 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add a password']
     },
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
     watchlist: [watchlistItemSchema],
+    watchHistory: [watchHistorySchema],
     notifications: [notificationSchema],
     ratings: [ratingSchema],
     preferences: {

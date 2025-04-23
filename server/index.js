@@ -10,6 +10,7 @@ import chatRoutes from './routes/chat.routes.js';
 import userRoutes from './routes/userRoutes.js';
 import imdbRoutes from './routes/imdb.routes.js';
 import youtubeRoutes from './routes/youtubeRoutes.js';
+import watchHistoryRoutes from './routes/watchHistory.routes.js';
 import { errorHandler } from './middleware/errorMiddleware.js'
 
 const PORT = process.env.PORT || 8000
@@ -23,6 +24,7 @@ connectDB()
 app.get('/', (req, res) => res.send('🌍 API is running'));
 app.use('/api/anime', animeRoutes);
 app.use('/api/watchlist', watchlistRoutes);
+app.use('/api/watch-history', watchHistoryRoutes);
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
@@ -31,5 +33,4 @@ app.use('/api/users', userRoutes);
 app.use('/api/imdb', imdbRoutes);
 app.use(errorHandler)
 
-
-app.listen(PORT, () => {console.log(`Server is running on ${process.env.PORT}`)})
+app.listen(PORT, () => { console.log(`Server is running on ${process.env.PORT}`) })
