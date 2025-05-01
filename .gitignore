@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 .env
 scraper.js
+server/routes/Comment.js
