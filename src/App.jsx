@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 import MainLayout from './layouts/MainLayout.jsx'
 import HomePage from './pages/HomePage.jsx'
 import About from './pages/About.jsx'
-import WatchlistPage from './pages/WatchlistPage.jsx'
 import AnimeDetailsPage from './pages/AnimeDetailsPage.jsx'
 import AllAnimePage from './pages/AllAnimePage.jsx'
 import StreamPage from './pages/StreamPage.jsx'
@@ -14,7 +13,6 @@ import Register from './components/Register.jsx'
 import Login from './components/Login.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import YouTubePlayerPage from './pages/YouTubePlayerPage.jsx'
-import WatchHistoryPage from './pages/WatchHistoryPage.jsx'
 import AdminPanel from './pages/AdminPanel.jsx'
 
 function App() {
@@ -26,8 +24,6 @@ function App() {
         <Route path='/' element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path='/about' element={<About />} />
-          <Route path='/watchlist' element={<WatchlistPage />} />
-          <Route path='/watch-history' element={<WatchHistoryPage />} />
           <Route path='/anime/:id' element={<AnimeDetailsPage />} />
           <Route path='/anime/:id/watch' element={<DynamicStreamPage />} />
           <Route path='/all-anime' element={<AllAnimePage />} />
