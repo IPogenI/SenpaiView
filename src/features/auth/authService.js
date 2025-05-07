@@ -2,7 +2,7 @@ import api from '../../api/axios.js'
 
 // Register User
 const register = async ( userData ) => {
-    const response = await api.post("/users/", userData)
+    const response = await api.post("/users", userData)
 
     if(response.data) {
         localStorage.setItem('user', JSON.stringify(response.data))
