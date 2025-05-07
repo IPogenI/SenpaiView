@@ -1,4 +1,4 @@
-import api from '../../api/axios'
+import api from '../../api/axios.js'
 
 const API_URL = "/api/users/"
 
