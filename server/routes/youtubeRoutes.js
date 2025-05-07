@@ -3,9 +3,9 @@ import Youtube from '../models/Youtube.js';
 import axios from 'axios';
 import { protect } from "../middleware/authMiddleware.js"
 import {
-    getAllChannels,
-    addChannel,
-    deleteChannel
+  getAllChannels,
+  addChannel,
+  deleteChannel
 } from "../controllers/youtubeController.js"
 
 const router = express.Router();
@@ -18,79 +18,43 @@ const isCacheStale = (lastUpdated) => {
 
 // Get channel videos (with caching)
 router.get('/channel/:handle', async (req, res) => {
-
   try {
     const { handle } = req.params;
-    
-    // Check cache first
-    let cacheEntry = await Youtube.findOne({ channelHandle: handle });
-    
-    // If cache exists and is not stale, return cached data
-    if (cacheEntry && !isCacheStale(cacheEntry.lastUpdated)) {
 
+    // Check if channel exists in database
+    const channel = await Youtube.findOne({ channelHandle: handle });
+
+    if (!channel) {
+      return res.status(404).json({ message: 'Channel not found in database' });
+    }
+
+    // If cache is not stale, return cached data
+    if (!isCacheStale(channel.lastUpdated)) {
       return res.json({
-        channelId: cacheEntry.channelId,
-        videos: cacheEntry.videos
+        channelId: channel.channelId,
+        videos: channel.videos
       });
     }
-    
-    console.log('Cache miss or stale for:', handle, '- fetching fresh data');
 
-    // If no cache or stale, fetch from YouTube API
-    // First get channel ID
-    console.log('Cache miss or stale, fetching from YouTube API');
-    const channelResponse = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
-      params: {
-        part: 'snippet',
-        q: handle,
-        type: 'channel',
-        key: process.env.YOUTUBE_API_KEY
-      }
-    });
+    console.log('Cache stale for:', handle, '- fetching fresh data');
 
-    if (!channelResponse.data.items?.length) {
-      return res.status(404).json({ message: 'Channel not found' });
-    }
-
-    const channelId = channelResponse.data.items[0].id.channelId;
-    // Get recent videos (fetch more since we'll filter out Shorts)
+    // Fetch fresh data from YouTube API
     const videosResponse = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
       params: {
         part: 'snippet',
-        channelId: channelId,
-        maxResults: 25, // Fetch more since we'll filter out Shorts
+        channelId: channel.channelId,
+        maxResults: 25,
         order: 'date',
         type: 'video',
         key: process.env.YOUTUBE_API_KEY
       }
     });
-    
-    console.log('Search response:', {
-      totalResults: videosResponse.data.pageInfo?.totalResults,
-      resultsPerPage: videosResponse.data.pageInfo?.resultsPerPage,
-      itemCount: videosResponse.data.items?.length
-    });
 
     if (!videosResponse.data.items?.length) {
-      console.log('No videos found for channel:', channelId);
-      return res.json({ channelId, videos: [] });
+      return res.json({ channelId: channel.channelId, videos: [] });
     }
 
-    // Get video details to check duration
-    const searchResults = videosResponse.data.items || [];
-    if (!searchResults.length) {
-      console.log('No videos found in search results');
-      return res.json({ channelId, videos: [] });
-    }
-
-    console.log('Search returned', searchResults.length, 'videos');
-    const videoIds = searchResults.map(item => item.id.videoId).join(',');
-    if (!videoIds) {
-      console.log('No valid video IDs found in search results');
-      return res.json({ channelId, videos: [] });
-    }
-
-    console.log('Fetching details for videos:', videoIds);
+    const videoIds = videosResponse.data.items.map(item => item.id.videoId).join(',');
 
     const videoDetailsResponse = await axios.get(`https://www.googleapis.com/youtube/v3/videos`, {
       params: {
@@ -113,25 +77,14 @@ router.get('/channel/:handle', async (req, res) => {
       }
     };
 
-    // Filter out Shorts (videos less than 5 minutes) and map to desired format
-    let allVideos = videoDetailsResponse.data.items || [];
-
-    let filteredVideos = allVideos
+    // Filter out Shorts and map to desired format
+    const filteredVideos = videoDetailsResponse.data.items
       .filter(item => {
-        if (!item.contentDetails?.duration) {
-  
-          return false;
-        }
+        if (!item.contentDetails?.duration) return false;
         const duration = parseDuration(item.contentDetails.duration);
-        const isShort = duration < 300;
-        console.log(`Video ${item.id} - ${item.snippet?.title} - duration: ${duration}s, isShort: ${isShort}`);
-        return !isShort;
-      });
-
-    console.log(`Found ${filteredVideos.length} videos longer than 5 minutes`);
-    
-    const videos = filteredVideos
-      .slice(0, 3) // Show up to 3 non-Shorts videos
+        return duration >= 300; // Include videos that are 5 minutes or longer
+      })
+      .slice(0, 3)
       .map(item => ({
         videoId: item.id,
         title: item.snippet.title,
@@ -139,24 +92,13 @@ router.get('/channel/:handle', async (req, res) => {
         thumbnails: item.snippet.thumbnails,
         publishedAt: item.snippet.publishedAt
       }));
-    
 
-    // Update or create cache
-    try {
-      if (cacheEntry) {
-        cacheEntry.videos = videos;
-        cacheEntry.lastUpdated = new Date();
-        await cacheEntry.save();
-      } else {
-        // Instead of creating a new channel, return 404
-        return res.status(404).json({ message: 'Channel not found in database' });
-      }
-    } catch (error) {
-      console.error('Error updating cache:', error);
-      // Don't throw the error - we still want to return the videos even if caching fails
-    }
+    // Update channel's videos and lastUpdated
+    channel.videos = filteredVideos;
+    channel.lastUpdated = new Date();
+    await channel.save();
 
-    res.json({ channelId, videos });
+    res.json({ channelId: channel.channelId, videos: filteredVideos });
   } catch (error) {
     console.error('Error fetching YouTube data:', error);
     res.status(500).json({ message: 'Error fetching YouTube data' });

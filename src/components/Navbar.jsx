@@ -73,23 +73,23 @@ const Navbar = () => {
   }, [isDropdownOpen]);
 
   return (
-    <nav className="absolute w-screen text-white px-8 py-2 flex items-center justify-between z-50">
+    <nav className="fixed w-full text-white px-4 sm:px-8 py-2 flex items-center justify-between z-50 bg-gray-900 bg-opacity-90 backdrop-blur-sm">
       {/* Left avatar with dropdown */}
       <div className="dropdown-container relative">
         {user ? (
           <div className="flex items-center gap-2">
-            <div 
+            <div
               className="flex items-center gap-2 cursor-pointer select-none"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <img
                 src="/logo/Logo.png"
                 alt="Profile"
-                className="w-10 h-10 rounded-full border-2 border-blue-500 select-none"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-blue-500 select-none"
               />
               <ChevronDown size={16} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''} select-none`} />
             </div>
-            
+
             {/* Dropdown menu */}
             {isDropdownOpen && (
               <div className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50 select-none">
@@ -128,7 +128,7 @@ const Navbar = () => {
             <img
               src="/logo/Logo.png"
               alt="Profile"
-              className="w-10 h-10 rounded-full border-2 border-blue-500 cursor-pointer select-none"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-blue-500 cursor-pointer select-none"
               onClick={openRegister}
             />
             <Register open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} onLogin={openLogin} />
@@ -138,61 +138,25 @@ const Navbar = () => {
       </div>
 
       {/* Center nav box */}
-      <div className="flex items-center justify-center bg-[#1a1a1a] rounded-xl px-4 py-2 gap-4 w-full max-w-4xl mx-4">
-        <Link to="/" className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white hover:bg-[#333333] whitespace-nowrap">
-          Home
-        </Link>
-
-        <div className="flex items-center bg-[#1a1a1a] px-3 py-2 rounded-md text-sm text-gray-300 w-full">
-          <Search size={18} className="mr-2" />
-
-          <div className="relative inline-block text-left w-full max-w-xs">
-            <input onFocus={() => setDrop(true)} onBlur={() => setTimeout(() => setDrop(false), 200)} onChange={(e) => setQuery(e.target.value)} value={query} type="text" placeholder="Search Anime" className="bg-gray-800 text-white outline-none w-full placeholder-gray-400 border border-gray-600 px-4 py-2 rounded-md" id="menu-button" aria-expanded={drop} aria-haspopup="true" />
-
-            {drop && filteredList.length > 0 && (
-              <div className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-gray-900 shadow-lg ring-1 ring-white/10 max-h-64 overflow-y-auto transition-all" role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
-                <div className="py-1" role="none">
-                  {filteredList.map((anime, i) => (
-                    <div
-                      key={i}
-                      onClick={() => {
-                        setDrop(false);
-                        navigate(`/anime/${anime._id}`);
-                      }}
-                      className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition cursor-pointer"
-                      role="menuitem"
-                      tabIndex={0}
-                    >
-                      {anime.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <Link to="/all-anime" className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white hover:bg-[#333333] whitespace-nowrap">
-          All Anime
-        </Link>
-        <button className="flex items-center bg-[#262626] px-3 py-2 rounded-md text-sm text-white hover:bg-[#333333]">
-          <Filter size={16} className="mr-1" />
-          Filter
-        </button>
-
-        <div className="flex gap-4 ml-4 text-sm text-gray-300">
-          <a href="#" className="hover:text-white">Trending</a>
-          <Link to="/watch-history" className="hover:text-white">Watch History</Link>
-          <a href="#" className="hover:text-white">Support</a>
+      <div className="flex-1 flex justify-center">
+        <div className="flex items-center gap-4 sm:gap-8">
+          <Link to="/" className="text-sm sm:text-base hover:text-blue-400 transition-colors">Home</Link>
+          <Link to="/all-anime" className="text-sm sm:text-base hover:text-blue-400 transition-colors">All Anime</Link>
+          <Link to="/watchlist" className="text-sm sm:text-base hover:text-blue-400 transition-colors">Watchlist</Link>
+          <Link to="/watch-history" className="text-sm sm:text-base hover:text-blue-400 transition-colors">History</Link>
         </div>
       </div>
 
-      {/* Right side icons */}
-      <div className="flex items-center gap-4">
-        <Link to="/watchlist" className="flex items-center text-white hover:text-gray-300">
-          <List size={22} />
-        </Link>
-        {user && <NotificationSystem userId={user._id} />}
+      {/* Right search box */}
+      <div className="hidden sm:block">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="bg-gray-800 text-white px-4 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+          />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+        </div>
       </div>
     </nav>
   );

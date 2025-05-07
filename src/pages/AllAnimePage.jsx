@@ -2,15 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Star, Plus, Check } from 'lucide-react';
+import { Star, Plus, Check, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
 import YoutubeChannels from '../components/YoutubeChannels';
 
 const AllAnimePage = () => {
   const [animeList, setAnimeList] = useState([]);
+  const [filteredAnime, setFilteredAnime] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
+  // Filter states
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
+
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -90,6 +97,50 @@ const AllAnimePage = () => {
     }
   };
 
+  // Updated useEffect for filtering and sorting (removed search filter)
+  useEffect(() => {
+    let result = [...animeList];
+
+    // Apply genre filter
+    if (selectedGenre) {
+      result = result.filter(anime =>
+        anime.genres.toLowerCase().includes(selectedGenre.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (selectedStatus) {
+      result = result.filter(anime =>
+        anime.status.toLowerCase() === selectedStatus.toLowerCase()
+      );
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'rating':
+          comparison = parseFloat(a.averageRating) - parseFloat(b.averageRating);
+          break;
+        case 'episodes':
+          comparison = (a.episodes || 0) - (b.episodes || 0);
+          break;
+        default:
+          comparison = 0;
+      }
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    setFilteredAnime(result);
+  }, [animeList, selectedGenre, selectedStatus, sortBy, sortOrder]);
+
+  // Get unique genres and statuses for filter options
+  const genres = [...new Set(animeList.flatMap(anime => anime.genres.split(',').map(g => g.trim())))];
+  const statuses = [...new Set(animeList.map(anime => anime.status))];
+
   const StarRating = ({ rating, onRate, userRating }) => {
     return (
       <div className="flex gap-1">
@@ -107,7 +158,6 @@ const AllAnimePage = () => {
     );
   };
 
-
   if (loading) {
     return (
       <div className="flex justify-center items-center w-screen h-screen bg-black">
@@ -121,46 +171,105 @@ const AllAnimePage = () => {
       <div className="max-w-6xl mx-auto">
         <section>
           <h1 className="text-2xl font-bold text-white mb-6">All Anime</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-          {animeList.map((anime) => (
-            <div key={anime._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
-              <div className="flex justify-between items-start mb-3">
-                <h2 className="text-xl font-semibold text-white hover:text-blue-400 cursor-pointer" onClick={() => navigate(`/anime/${anime._id}`)}>{anime.name}</h2>
-                <button
-                  onClick={() => !anime.inWatchlist && addToWatchlist(anime._id)}
-                  className={`flex items-center gap-1 px-3 py-1 rounded ${anime.inWatchlist
-                      ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
-                  disabled={anime.inWatchlist}
+
+          {/* Filter Bar - Removed search input */}
+          <div className="bg-gray-800 p-4 rounded-lg mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Genre Filter */}
+              <div>
+                <select
+                  value={selectedGenre}
+                  onChange={(e) => setSelectedGenre(e.target.value)}
+                  className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {anime.inWatchlist ? <Check size={16} /> : <Plus size={16} />}
-                  {anime.inWatchlist ? 'Added' : 'Add to Watchlist'}
+                  <option value="">All Genres</option>
+                  {genres.map((genre) => (
+                    <option key={genre} value={genre}>{genre}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Status Filter */}
+              <div>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">All Status</option>
+                  {statuses.map((status) => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort By */}
+              <div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="name">Name</option>
+                  <option value="rating">Rating</option>
+                  <option value="episodes">Episodes</option>
+                </select>
+              </div>
+
+              {/* Sort Order */}
+              <div>
+                <button
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2"
+                >
+                  {sortOrder === 'asc' ? <SortAsc size={20} /> : <SortDesc size={20} />}
+                  {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
                 </button>
               </div>
-
-              <div className="text-gray-400 mb-3">
-                <p>Episodes: {anime.episodes || 'N/A'}</p>
-                <p>Status: {anime.status}</p>
-                <p>Genres: {anime.genres}</p>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-gray-400 mb-1">Your Rating:</p>
-                  <StarRating
-                    rating={5}
-                    userRating={anime.userRating}
-                    onRate={(rating) => handleRating(anime._id, rating)}
-                  />
-                </div>
-                <div className="text-right">
-                  <p className="text-gray-400">Average Rating</p>
-                  <p className="text-2xl font-bold text-yellow-400">{anime.averageRating}</p>
-                </div>
-              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Anime Grid - Update to use filteredAnime instead of animeList */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            {filteredAnime.map((anime) => (
+              <div key={anime._id} className="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <div className="flex justify-between items-start mb-3">
+                  <h2 className="text-xl font-semibold text-white hover:text-blue-400 cursor-pointer" onClick={() => navigate(`/anime/${anime._id}`)}>{anime.name}</h2>
+                  <button
+                    onClick={() => !anime.inWatchlist && addToWatchlist(anime._id)}
+                    className={`flex items-center gap-1 px-3 py-1 rounded ${anime.inWatchlist
+                      ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    disabled={anime.inWatchlist}
+                  >
+                    {anime.inWatchlist ? <Check size={16} /> : <Plus size={16} />}
+                    {anime.inWatchlist ? 'Added' : 'Add to Watchlist'}
+                  </button>
+                </div>
+
+                <div className="text-gray-400 mb-3">
+                  <p>Episodes: {anime.episodes || 'N/A'}</p>
+                  <p>Status: {anime.status}</p>
+                  <p>Genres: {anime.genres}</p>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-gray-400 mb-1">Your Rating:</p>
+                    <StarRating
+                      rating={5}
+                      userRating={anime.userRating}
+                      onRate={(rating) => handleRating(anime._id, rating)}
+                    />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-400">Average Rating</p>
+                    <p className="text-2xl font-bold text-yellow-400">{anime.averageRating}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
