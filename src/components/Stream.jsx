@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactPlayer from 'react-player/lazy';
 import { FiSearch } from 'react-icons/fi';
-import axios from 'axios';
+import api from '../api/axios';
 import './Stream.css';
 
 const Stream = () => {
@@ -19,7 +19,7 @@ const Stream = () => {
         setLoading(true);
 
         try {
-            const res = await axios.get(`/api/anime/episodes?title=${animeName}`);
+            const res = await api.get(`/anime/episodes?title=${animeName}`);
             if (res.data.episodes && res.data.episodes.length > 0) {
                 setEpisodes(res.data.episodes);
             } else {

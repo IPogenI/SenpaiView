@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { toast } from 'react-toastify';
 import AddYoutubeChannel from '../components/AddYoutubeChannel';
 
@@ -19,21 +19,21 @@ const AdminPanel = () => {
       try {
         setLoading(true);
         if (activeTab === 'users') {
-          const res = await axios.get('http://localhost:8000/api/users/all', {
+          const res = await api.get('/users/all', {
             headers: {
               Authorization: `Bearer ${user.token}`
             }
           });
           setUsers(res.data);
         } else if (activeTab === 'anime') {
-          const res = await axios.get('http://localhost:8000/api/anime', {
+          const res = await api.get('/anime', {
             headers: {
               Authorization: `Bearer ${user.token}`
             }
           });
           setAnimeList(res.data);
         } else if (activeTab === 'youtube') {
-          const res = await axios.get('http://localhost:8000/api/youtube', {
+          const res = await api.get('/youtube', {
             headers: {
               Authorization: `Bearer ${user.token}`
             }
@@ -54,7 +54,7 @@ const AdminPanel = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await axios.delete(`http://localhost:8000/api/users/${userId}`, {
+        await api.delete(`/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -70,7 +70,7 @@ const AdminPanel = () => {
 
   const handleAddChannel = async (newChannel) => {
     try {
-      const res = await axios.post('http://localhost:8000/api/youtube', newChannel, {
+      const res = await api.post('/youtube', newChannel, {
         headers: {
           Authorization: `Bearer ${user.token}`
         }
@@ -86,7 +86,7 @@ const AdminPanel = () => {
   const handleDeleteChannel = async (channelId) => {
     if (window.confirm('Are you sure you want to delete this channel?')) {
       try {
-        await axios.delete(`http://localhost:8000/api/youtube/${channelId}`, {
+        await api.delete(`/youtube/${channelId}`, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -103,7 +103,7 @@ const AdminPanel = () => {
   const handleDeleteAnime = async (animeId) => {
     if (window.confirm('Are you sure you want to delete this anime?')) {
       try {
-        await axios.delete(`http://localhost:8000/api/anime/${animeId}`);
+        await api.delete(`/anime/${animeId}`);
         setAnimeList(animeList.filter(anime => anime._id !== animeId));
         toast.success('Anime deleted successfully');
       } catch (error) {

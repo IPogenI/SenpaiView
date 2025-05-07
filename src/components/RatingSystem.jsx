@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { FaStar } from 'react-icons/fa';
 
 const RatingSystem = ({ animeId, userId }) => {
@@ -14,8 +14,8 @@ const RatingSystem = ({ animeId, userId }) => {
         const fetchRatings = async () => {
             try {
                 const [animeRatings, userRating] = await Promise.all([
-                    axios.get(`http://localhost:8000/api/ratings/anime/${animeId}`),
-                    userId ? axios.get(`http://localhost:8000/api/ratings/anime/${animeId}/user/${userId}`) : Promise.resolve({ data: null })
+                    api.get(`/ratings/anime/${animeId}`),
+                    userId ? api.get(`/ratings/anime/${animeId}/user/${userId}`) : Promise.resolve({ data: null })
                 ]);
 
                 setAllRatings(animeRatings.data.ratings);
@@ -50,7 +50,7 @@ const RatingSystem = ({ animeId, userId }) => {
         }
 
         try {
-            await axios.post('http://localhost:8000/api/ratings', {
+            await api.post('/ratings', {
                 animeId,
                 userId,
                 rating,
@@ -58,7 +58,7 @@ const RatingSystem = ({ animeId, userId }) => {
             });
 
             // Refresh ratings after submission
-            const response = await axios.get(`http://localhost:8000/api/ratings/anime/${animeId}`);
+            const response = await api.get(`/ratings/anime/${animeId}`);
             setAllRatings(response.data.ratings);
             setStats(response.data.stats);
         } catch (error) {

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import api from '../../api/axios'
 
 const API_URL = "/api/users/"
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { FaSpinner } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ const YoutubeChannels = () => {
   useEffect(() => {
     const fetchChannels = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/youtube');
+        const response = await api.get('/youtube');
         setChannels(response.data);
         
         // Initialize channelVideos with videos from the response
@@ -35,7 +35,7 @@ const YoutubeChannels = () => {
 
   const fetchChannelVideos = async (handle) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/youtube/channel/${handle}`);
+      const response = await api.get(`/youtube/channel/${handle}`);
       if (response.data && response.data.videos) {
         setChannelVideos(prev => ({
           ...prev,

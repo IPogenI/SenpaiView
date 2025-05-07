@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axios';
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ const ChatBot = () => {
 
     try {
       const pageContent = document.body.innerText; // Get current page content
-      const response = await axios.post('/api/chat/message', {
+      const response = await api.post('/chat/message', {
         userId,
         message: userMessage,
         context: pageContent

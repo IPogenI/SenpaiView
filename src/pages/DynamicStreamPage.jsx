@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import api from '../api/axios';
 import { FaSpinner } from 'react-icons/fa';
 import ReactPlayer from 'react-player/lazy';
 
@@ -27,12 +27,12 @@ const DynamicStreamPage = () => {
     const fetchAnimeDetails = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:8000/api/anime/${id}`);
+            const response = await api.get(`/anime/${id}`);
             setAnime(response.data);
             setError(null);
 
             // Fetch episodes using the anime name
-            const episodesRes = await axios.get(`http://localhost:8000/api/anime/episodes?title=${encodeURIComponent(response.data.name)}`);
+            const episodesRes = await api.get(`/anime/episodes?title=${encodeURIComponent(response.data.name)}`);
             if (episodesRes.data.episodes && episodesRes.data.episodes.length > 0) {
                 setEpisodes(episodesRes.data.episodes);
             } else {

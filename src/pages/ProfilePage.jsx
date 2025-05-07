@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { User, Mail, Shield, Clock, Star, List, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Watchlist from '../components/Watchlist';
@@ -57,12 +57,12 @@ const ProfilePage = () => {
 
   const fetchRecommendations = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}/recommendations`);
+      const response = await api.get(`/watchlist/${user._id}/recommendations`);
 
       // Get ratings for each recommended anime
       const recommendationsWithRatings = await Promise.all(response.data.map(async (anime) => {
         try {
-          const allRatingsRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}`);
+          const allRatingsRes = await api.get(`/ratings/anime/${anime._id}`);
           const { stats } = allRatingsRes.data;
           const averageRating = stats ? stats.averageRating : 0;
 
@@ -96,7 +96,7 @@ const ProfilePage = () => {
 
   const addToWatchlist = async (animeId) => {
     try {
-      await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${animeId}`, {
+      await api.post(`/watchlist/${user._id}/anime/${animeId}`, {
         status: 'Plan to Watch'
       });
       fetchUserStats(); // Refresh stats

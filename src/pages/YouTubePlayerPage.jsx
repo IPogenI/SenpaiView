@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { FaSpinner } from 'react-icons/fa';
 
 const YouTubePlayerPage = () => {
@@ -16,14 +16,14 @@ const YouTubePlayerPage = () => {
       setLoading(true);
       try {
         // First fetch all channels
-        const channelsResponse = await axios.get('http://localhost:8000/api/youtube');
+        const channelsResponse = await api.get('/youtube');
         const channels = channelsResponse.data;
         
         let allVideos = [];
 
         // Fetch videos for each channel
         for (const channel of channels) {
-          const response = await axios.get(`http://localhost:8000/api/youtube/channel/${channel.channelHandle}`);
+          const response = await api.get(`/youtube/channel/${channel.channelHandle}`);
           if (response.data && response.data.videos) {
             allVideos = [...allVideos, ...response.data.videos];
           }

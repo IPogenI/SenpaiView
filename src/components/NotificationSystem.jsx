@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { Bell, CheckCircle, Trash } from 'lucide-react';
 import './NotificationSystem.css';
 
@@ -19,7 +19,7 @@ const NotificationSystem = ({ userId }) => {
                 setUnreadCount(0);
                 return;
             }
-            const response = await axios.get(`http://localhost:8000/api/notifications/user/${userId}`);
+            const response = await api.get(`/notifications/user/${userId}`);
             const notificationsData = response.data || [];
             setNotifications(notificationsData);
             setUnreadCount(notificationsData.filter(n => !n.isRead).length);
@@ -51,7 +51,7 @@ const NotificationSystem = ({ userId }) => {
     // Mark a notification as read
     const markAsRead = async (notificationId) => {
         try {
-            await axios.patch(`http://localhost:8000/api/notifications/${notificationId}/read`);
+            await api.patch(`/notifications/${notificationId}/read`);
             setNotifications(notifications.map(notification =>
                 notification._id === notificationId
                     ? { ...notification, isRead: true }
@@ -66,7 +66,7 @@ const NotificationSystem = ({ userId }) => {
     // Mark all notifications as read
     const markAllAsRead = async () => {
         try {
-            await axios.patch(`http://localhost:8000/api/notifications/user/${userId}/read-all`);
+            await api.patch(`/notifications/user/${userId}/read-all`);
             setNotifications(notifications.map(notification => ({
                 ...notification,
                 isRead: true
@@ -80,7 +80,7 @@ const NotificationSystem = ({ userId }) => {
     // Delete a notification
     const deleteNotification = async (notificationId) => {
         try {
-            await axios.delete(`http://localhost:8000/api/notifications/${notificationId}`);
+            await api.delete(`/notifications/${notificationId}`);
             setNotifications(notifications.filter(n => n._id !== notificationId));
             setUnreadCount(prev => 
                 notifications.find(n => n._id === notificationId && !n.isRead)

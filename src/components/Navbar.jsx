@@ -43,7 +43,7 @@ const Navbar = () => {
   // Getting animelist from database
   const getAnimeList = async (query = '') => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/anime`);
+      const res = await axios.get(`/api/anime`);
       setAnimeList(res.data);
     } catch (err) {
       console.error("Error fetching anime list:", err);

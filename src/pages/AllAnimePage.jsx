@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { Star, Plus, Check } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
 import YoutubeChannels from '../components/YoutubeChannels';
@@ -30,16 +30,16 @@ const AllAnimePage = () => {
   const fetchAnimeList = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/anime');
+      const response = await api.get('/anime');
       // Get watchlist status for each anime
-      const watchlistRes = await axios.get(`http://localhost:8000/api/watchlist/${user._id}`);
+      const watchlistRes = await api.get(`/watchlist/${user._id}`);
       const watchlistMap = new Map(watchlistRes.data.map(item => [item.animeId._id, item]));
 
       // Get user ratings for each anime
       const animeWithDetails = await Promise.all(response.data.map(async (anime) => {
         try {
-          const ratingRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}/user/${user._id}`);
-          const allRatingsRes = await axios.get(`http://localhost:8000/api/ratings/anime/${anime._id}`);
+          const ratingRes = await api.get(`/ratings/anime/${anime._id}/user/${user._id}`);
+          const allRatingsRes = await api.get(`/ratings/anime/${anime._id}`);
 
           const { stats } = allRatingsRes.data;
           const averageRating = stats ? stats.averageRating : 0;
@@ -70,7 +70,7 @@ const AllAnimePage = () => {
 
   const handleRating = async (animeId, rating) => {
     try {
-      await axios.post(`http://localhost:8000/api/ratings/${user._id}/anime/${animeId}`, {
+      await api.post(`/ratings/${user._id}/anime/${animeId}`, {
         rating
       });
       fetchAnimeList(); // Refresh the list to update ratings
@@ -81,7 +81,7 @@ const AllAnimePage = () => {
 
   const addToWatchlist = async (animeId) => {
     try {
-      await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${animeId}`, {
+      await api.post(`/watchlist/${user._id}/anime/${animeId}`, {
         status: 'Plan to Watch'
       });
       fetchAnimeList(); // Refresh the list to update watchlist status

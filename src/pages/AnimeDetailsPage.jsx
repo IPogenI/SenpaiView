@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import api from '../api/axios';
 import { Plus, Star, Calendar, Film, Award, Play } from 'lucide-react';
 import { FaSpinner } from 'react-icons/fa';
 
@@ -40,7 +40,7 @@ const AnimeDetailsPage = () => {
     try {
       setLoading(true);
       // Fetch basic anime details
-      const response = await axios.get(`http://localhost:8000/api/anime/${id}`);
+      const response = await api.get(`/anime/${id}`);
       setAnime(response.data);
 
       // Fetch IMDB data
@@ -52,7 +52,7 @@ const AnimeDetailsPage = () => {
         .trim();
 
       console.log('Searching IMDB for:', searchTitle);
-      const imdbResponse = await axios.get(`http://localhost:8000/api/imdb/${encodeURIComponent(searchTitle)}`);
+      const imdbResponse = await api.get(`/imdb/${encodeURIComponent(searchTitle)}`);
       setImdbData(imdbResponse.data);
       setError(null);
     } catch (error) {
@@ -67,7 +67,7 @@ const AnimeDetailsPage = () => {
     try {
       if (!anime?._id) return;
 
-      const response = await axios.get(`http://localhost:8000/api/watchlist/${user._id}/check/${anime._id}`);
+      const response = await api.get(`/watchlist/${user._id}/check/${anime._id}`);
       setAddedToWatchlist(response.data.inWatchlist);
     } catch (error) {
       setAddedToWatchlist(false);
@@ -80,7 +80,7 @@ const AnimeDetailsPage = () => {
         return;
       }
 
-      await axios.post(`http://localhost:8000/api/watchlist/${user._id}/anime/${anime._id}`, {
+      await api.post(`/watchlist/${user._id}/anime/${anime._id}`, {
         status: 'Plan to Watch'
       });
 
@@ -92,7 +92,7 @@ const AnimeDetailsPage = () => {
 
   const handleWatchNow = async () => {
     try {
-      await axios.post(`http://localhost:8000/api/watch-history/${user._id}/anime/${anime._id}`);
+      await api.post(`/watch-history/${user._id}/anime/${anime._id}`);
       navigate(`/anime/${anime._id}/watch`);
     } catch (error) {
       // Still navigate even if watch history fails

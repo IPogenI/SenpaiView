@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { Star, Calendar, Film, Trash2, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,7 +15,7 @@ const WatchHistory = ({ limit }) => {
     const fetchWatchHistory = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:8000/api/watch-history/${user._id}`);
+            const response = await api.get(`/watch-history/${user._id}`);
             // Sort by date in descending order (most recent first) and take only specified number of items
             const sortedHistory = response.data
                 .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
@@ -36,7 +36,7 @@ const WatchHistory = ({ limit }) => {
 
     const removeFromWatchHistory = async (animeId) => {
         try {
-            await axios.delete(`http://localhost:8000/api/watch-history/${user._id}/anime/${animeId}`);
+            await api.delete(`/watch-history/${user._id}/anime/${animeId}`);
             fetchWatchHistory();
             toast.success('Removed from watch history');
         } catch (error) {
@@ -46,7 +46,7 @@ const WatchHistory = ({ limit }) => {
 
     const handleRating = async (animeId, rating) => {
         try {
-            await axios.post(`http://localhost:8000/api/ratings/${user._id}/anime/${animeId}`, {
+            await api.post(`/ratings/${user._id}/anime/${animeId}`, {
                 rating
             });
             fetchWatchHistory();
