@@ -1,12 +1,12 @@
 import { React, useState, useEffect } from 'react';
 import { Filter, Search, List, ChevronDown } from 'lucide-react';
-import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
 import NotificationSystem from './NotificationSystem';
 import Register from './Register';
 import { useSelector, useDispatch } from 'react-redux'
 import { logout, reset } from "../features/auth/authSlice"
 import Login from './Login';
+import api from '../api/axios';
 
 const Navbar = () => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -43,7 +43,7 @@ const Navbar = () => {
   // Getting animelist from database
   const getAnimeList = async (query = '') => {
     try {
-      const res = await axios.get(`/api/anime`);
+      const res = await api.get(`/anime`);
       setAnimeList(res.data);
     } catch (err) {
       console.error("Error fetching anime list:", err);
