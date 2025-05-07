@@ -1,6 +1,7 @@
 import dbConnect from '../server/db/db.js';
 import AnimeListModel from '../server/models/AnimeList.js';
 import { fetchEpisodeLinks } from '../server/scraper.js';
+import api from '../api/axios';
 
 export default async function handler(req, res) {
   await dbConnect();
