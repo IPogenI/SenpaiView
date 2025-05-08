@@ -16,16 +16,7 @@ import { errorHandler } from './middleware/errorMiddleware.js'
 const PORT = process.env.PORT || 8000
 
 const app = express()
-// Configure CORS
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? ['https://your-frontend-domain.vercel.app'] // Replace with your actual frontend domain
-    : ['http://localhost:5173'], // Vite's default port
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-
+app.use(cors())
 
 app.use(express.json());
 connectDB()

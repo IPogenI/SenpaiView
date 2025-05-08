@@ -65,12 +65,12 @@ const HomePage = () => {
         )}
 
         {/* Overlay */}
-        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50" />
+        <div className="absolute top-0 left-0 w-screen h-screen bg-black opacity-50" />
 
         {/* Content */}
-        <div className="relative z-10 px-4 sm:px-8 md:px-12 lg:px-48 max-w-6xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3">{current.title}</h1>
-          <h2 className="text-base sm:text-lg md:text-xl font-light text-gray-300 mb-4">{current.subtitle}</h2>
+        <div className="relative z-10 px-48 sm:px-48 max-w-6xl">
+          <h1 className="text-3xl sm:text-5xl font-bold mb-3">{current.title}</h1>
+          <h2 className="text-lg sm:text-xl font-light text-gray-300 mb-4">{current.subtitle}</h2>
 
           {/* Tags */}
           <div className="flex gap-2 mb-4 flex-wrap">
@@ -86,26 +86,26 @@ const HomePage = () => {
 
           {/* Info */}
           <div className="flex flex-wrap gap-4 mb-6">
-            <div className="bg-black bg-opacity-80 px-3 py-2 rounded-md text-center">
-              <p className="text-xs sm:text-sm text-gray-400">Rating</p>
-              <p className="text-base sm:text-lg font-semibold">{current.rating}</p>
+            <div className="bg-black bg-opacity-80 px-4 py-2 rounded-md text-center">
+              <p className="text-sm text-gray-400">Rating</p>
+              <p className="text-lg font-semibold">{current.rating}</p>
             </div>
-            <div className="bg-black bg-opacity-80 px-3 py-2 rounded-md text-center">
-              <p className="text-xs sm:text-sm text-gray-400">Release</p>
-              <p className="text-base sm:text-lg font-semibold">{current.release}</p>
+            <div className="bg-black bg-opacity-80 px-4 py-2 rounded-md text-center">
+              <p className="text-sm text-gray-400">Release</p>
+              <p className="text-lg font-semibold">{current.release}</p>
             </div>
-            <div className="bg-black bg-opacity-80 px-3 py-2 rounded-md text-center">
-              <p className="text-xs sm:text-sm text-gray-400">Quality</p>
-              <p className="text-base sm:text-lg font-semibold">{current.quality}</p>
+            <div className="bg-black bg-opacity-80 px-4 py-2 rounded-md text-center">
+              <p className="text-sm text-gray-400">Quality</p>
+              <p className="text-lg font-semibold">{current.quality}</p>
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
-            <button className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-2 rounded-md transition">
+          <div className="flex items-center gap-4 mb-10">
+            <button className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-2 rounded-md transition">
               WATCH NOW
             </button>
-            <button className="w-full sm:w-auto p-2 bg-black bg-opacity-50 rounded-md border border-white/20">
+            <button className="p-2 bg-black bg-opacity-50 rounded-md border border-white/20">
               <Bookmark className="text-white" size={20} />
             </button>
           </div>
