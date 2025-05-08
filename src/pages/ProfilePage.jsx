@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, Mail, Shield, Clock, Star, List, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
-import Watchlist from '../components/Watchlist';
+import Watchlist from '../components/WatchList';
 import WatchHistory from '../components/WatchHistory';
 
 const ProfilePage = () => {
