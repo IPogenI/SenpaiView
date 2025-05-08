@@ -71,19 +71,17 @@ const DynamicStreamPage = () => {
                     <h1 className="text-2xl font-bold text-white mb-6">{anime.name}</h1>
                 )}
 
-                <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Video player */}
-                    <div className="w-full lg:w-2/3">
+                <div className="flex gap-10">
+                    {/* Video player on the left */}
+                    <div className="pr-4 flex items-center justify-center">
                         {episodes.length > 0 ? (
-                            <div className="aspect-video w-full">
-                                <ReactPlayer
-                                    url={episodes[selectedEp]}
-                                    controls
-                                    width="100%"
-                                    height="100%"
-                                    className="react-player rounded-lg border-2 border-gray-700"
-                                />
-                            </div>
+                            <ReactPlayer
+                                url={episodes[selectedEp]}
+                                controls
+                                width="50vw"
+                                height="55vh"
+                                className="react-player rounded-lg border-2 border-gray-700"
+                            />
                         ) : (
                             <div className="text-center text-gray-400">
                                 No episodes available
@@ -91,25 +89,26 @@ const DynamicStreamPage = () => {
                         )}
                     </div>
 
-                    {/* Episodes sidebar */}
-                    <div className="w-full lg:w-1/3">
-                        <div className="bg-gray-800 rounded-lg p-4">
-                            <h2 className="text-xl font-semibold text-white mb-4">Episodes</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto">
-                                {episodes.map((episode, index) => (
+                    {/* Episodes sidebar on the right */}
+                    <div className="h-[55vh] w-[25vw] bg-[#18181c] p-4 overflow-y-auto border border-gray-600 rounded-lg">
+                        <h2 className="text-lg font-semibold mb-4 text-center">Episodes</h2>
+                        {error && <p className="text-red-500 mb-4">{error}</p>}
+                        {episodes.length > 0 && (
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {episodes.map((_, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setSelectedEp(index)}
-                                        className={`p-2 rounded-lg text-sm ${selectedEp === index
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                        className={`w-10 h-10 rounded-md text-sm font-medium shadow-sm flex items-center justify-center transition-all duration-200 ${selectedEp === index
+                                            ? 'bg-orange-600 text-white'
+                                            : 'bg-[#2c2c30] text-gray-300 hover:bg-[#38383e]'
                                             }`}
                                     >
-                                        Episode {index + 1}
+                                        {index + 1}
                                     </button>
                                 ))}
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>
